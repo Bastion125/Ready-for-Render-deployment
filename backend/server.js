@@ -216,48 +216,124 @@ app.use((req, res) => {
 
 module.exports = app;
 
+// Функція для автоматичного створення адміністратора при першому запуску
+async function ensureAdminExists() {
+  try {
+    const prisma = require('./src/config/database');
+    const bcrypt = require('bcrypt');
+    
+    // Спочатку перевіряємо та створюємо ролі, якщо їх немає
+    const roles = [
+      { name: 'SystemAdmin', description: 'Системний адміністратор - повний доступ' },
+      { name: 'Admin', description: 'Адміністратор - адміністративний доступ' },
+      { name: 'Readit', description: 'Інструктор - може створювати курси та матеріали' },
+      { name: 'User', description: 'Звичайний користувач - тільки перегляд та проходження курсів' }
+    ];
+    
+    for (const roleData of roles) {
+      await prisma.role.upsert({
+        where: { name: roleData.name },
+        update: {},
+        create: roleData
+      });
+    }
+    
+    logger.info('✅ Ролі перевірено/створено');
+    
+    // Перевіряємо чи існує адміністратор
+    const systemAdminRole = await prisma.role.findUnique({
+      where: { name: 'SystemAdmin' }
+    });
+    
+    if (!systemAdminRole) {
+      logger.warn('⚠️ SystemAdmin role not found after creation. Something went wrong.');
+      return;
+    }
+    
+    const adminEmail = 'admin@test.local';
+    const existingAdmin = await prisma.user.findUnique({
+      where: { email: adminEmail }
+    });
+    
+    if (!existingAdmin) {
+      // Створюємо адміністратора
+      const adminPassword = 'admin123';
+      const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
+      
+      await prisma.user.create({
+        data: {
+          email: adminEmail,
+          passwordHash: adminPasswordHash,
+          roleId: systemAdminRole.id,
+          isActive: true,
+          full_name: 'System Administrator'
+        }
+      });
+      
+      logger.info('✅ ============================================');
+      logger.info('✅ Адміністратор автоматично створено!');
+      logger.info('✅ ============================================');
+      logger.info(`📧 Email:    ${adminEmail}`);
+      logger.info(`🔑 Пароль:   ${adminPassword}`);
+      logger.info('👤 Роль:     SystemAdmin (повний доступ)');
+      logger.info('✅ ============================================');
+    } else {
+      logger.info('ℹ️  Адміністратор вже існує');
+    }
+  } catch (error) {
+    logger.error('❌ Помилка при створенні адміністратора:', error);
+    // Не зупиняємо сервер, якщо не вдалося створити адміністратора
+  }
+}
+
 // Start server only when running directly (not when imported by tests)
 if (require.main === module) {
-  const server = app.listen(PORT, '0.0.0.0', () => {
-    logger.info(`🚀 Server is running on port ${PORT}`);
-    logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-    logger.info(`🌐 Server listening on 0.0.0.0:${PORT}`);
-  });
-
-  // Handle server errors
-  server.on('error', (error) => {
-    logger.error('Server error:', error);
-    if (error.code === 'EADDRINUSE') {
-      logger.error(`Port ${PORT} is already in use`);
-    }
-    process.exit(1);
-  });
-
-  // Graceful shutdown
-  process.on('SIGTERM', async () => {
-    logger.info('SIGTERM signal received: closing HTTP server');
-    server.close(() => {
-      logger.info('HTTP server closed');
-      process.exit(0);
+  // Спочатку перевіряємо та створюємо адміністратора
+  ensureAdminExists().then(() => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      logger.info(`🚀 Server is running on port ${PORT}`);
+      logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`🌐 Server listening on 0.0.0.0:${PORT}`);
     });
-  });
 
-  process.on('SIGINT', async () => {
-    logger.info('SIGINT signal received: closing HTTP server');
-    server.close(() => {
-      logger.info('HTTP server closed');
-      process.exit(0);
+    // Handle server errors
+    server.on('error', (error) => {
+      logger.error('Server error:', error);
+      if (error.code === 'EADDRINUSE') {
+        logger.error(`Port ${PORT} is already in use`);
+      }
+      process.exit(1);
     });
-  });
 
-  // Handle uncaught errors
-  process.on('uncaughtException', (error) => {
-    logger.error('Uncaught Exception:', error);
-    process.exit(1);
-  });
+    // Graceful shutdown
+    process.on('SIGTERM', async () => {
+      logger.info('SIGTERM signal received: closing HTTP server');
+      server.close(() => {
+        logger.info('HTTP server closed');
+        process.exit(0);
+      });
+    });
 
-  process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.on('SIGINT', async () => {
+      logger.info('SIGINT signal received: closing HTTP server');
+      server.close(() => {
+        logger.info('HTTP server closed');
+        process.exit(0);
+      });
+    });
+
+    // Handle uncaught errors
+    process.on('uncaughtException', (error) => {
+      logger.error('Uncaught Exception:', error);
+      process.exit(1);
+    });
+
+    process.on('unhandledRejection', (reason, promise) => {
+      logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+      process.exit(1);
+    });
+  }).catch((error) => {
+    logger.error('Failed to start server:', error);
     process.exit(1);
   });
 }

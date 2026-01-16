@@ -58,12 +58,9 @@ async function handleLogin(event) {
         if (data.success) {
             api.setToken(data.token);
             showSuccess('Успішний вхід! Перенаправлення...');
-            // Перевіряємо роль користувача для визначення куди перенаправити
-            const redirectUrl = (data.user && (data.user.role === 'Admin' || data.user.role === 'SystemAdmin')) 
-                ? 'admin.html' 
-                : 'training.html';
+            // Перенаправляємо на index.html, який сам визначить куди перенаправити залогіненого користувача
             setTimeout(() => {
-                window.location.href = redirectUrl;
+                window.location.href = 'index.html';
             }, 1000);
         } else {
             showError(data.message || 'Помилка входу. Перевірте дані та спробуйте ще раз.');
@@ -101,7 +98,7 @@ async function handleRegister(event) {
             api.setToken(data.token);
             showSuccess('Реєстрація успішна! Перенаправлення...');
             setTimeout(() => {
-                window.location.href = 'training.html';
+                window.location.href = 'index.html';
             }, 1000);
         }
     } catch (error) {
