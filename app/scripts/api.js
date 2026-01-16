@@ -42,40 +42,26 @@ function getRuntimeConfig() {
 // Railway URL: https://training-recording-production.up.railway.app
 // RAILWAY_API_URL: https://training-recording-production.up.railway.app/api
 //
-// Детальна інструкція: див. RENDER_DEPLOY.md
+// Детальна інструкція: див. backend/RAILWAY_DEPLOY.md
 
-// Render backend URL - автоматично визначається з window.location або використовується дефолтний
-// Якщо сайт відкритий з Render, використовується той самий домен для API
-// Інакше використовується дефолтний URL (оновіть після деплою)
-function getRenderApiUrl() {
-    if (IS_BROWSER && window.location.origin.includes('onrender.com')) {
-        // Якщо сайт на Render, використовуємо той самий домен
-        return `${window.location.origin}/api`;
-    }
-    // Дефолтний URL - оновіть після деплою на Render
-    return 'https://training-recording-backend.onrender.com/api';
-}
-
-const RENDER_API_URL = getRenderApiUrl();
+// Railway backend URL - оновіть на ваш фактичний Railway URL
+// Замініть 'ВАШ_RAILWAY_DOMAIN' на домен з Railway Settings → Networking
+const RAILWAY_API_URL = 'https://ВАШ_RAILWAY_DOMAIN.up.railway.app/api';
 
 const runtimeConfig = getRuntimeConfig();
 
 const API_BASE_URL = runtimeConfig.apiBaseUrl
-    || (IS_LOCALHOST ? 'http://localhost:3000/api' : (runtimeConfig.remoteApiUrl || RENDER_API_URL));
+    || (IS_LOCALHOST ? 'http://localhost:3000/api' : (runtimeConfig.remoteApiUrl || RAILWAY_API_URL));
 
-// Використовувати локальну SQLite в браузері (true) або backend API (false)
-// За замовчуванням використовується локальна БД для роботи без backend сервера
-const USE_LOCAL_DB = runtimeConfig.useLocalDb ?? true;
+// Використовувати backend API (а не локальну SQLite в браузері)
+const USE_LOCAL_DB = runtimeConfig.useLocalDb ?? false;
 
 // API Service
 const api = {
     // Auth endpoints
     async register(data) {
         if (USE_LOCAL_DB) {
-            if (typeof window !== 'undefined' && window.localAuth) {
-                return window.localAuth.register(data);
-            }
-            throw new Error('localAuth не ініціалізовано. Переконайтеся, що localApi.js завантажено.');
+            return localAuth.register(data);
         }
         return fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
@@ -89,10 +75,7 @@ const api = {
 
     async login(data) {
         if (USE_LOCAL_DB) {
-            if (typeof window !== 'undefined' && window.localAuth) {
-                return window.localAuth.login(data);
-            }
-            throw new Error('localAuth не ініціалізовано. Переконайтеся, що localApi.js завантажено.');
+            return localAuth.login(data);
         }
         try {
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -116,10 +99,7 @@ const api = {
     async logout() {
         const token = this.getToken();
         if (USE_LOCAL_DB) {
-            if (typeof window !== 'undefined' && window.localAuth) {
-                return window.localAuth.logout(token);
-            }
-            throw new Error('localAuth не ініціалізовано. Переконайтеся, що localApi.js завантажено.');
+            return localAuth.logout(token);
         }
         return fetch(`${API_BASE_URL}/auth/logout`, {
             method: 'POST',
@@ -133,10 +113,7 @@ const api = {
     async getCurrentUser() {
         const token = this.getToken();
         if (USE_LOCAL_DB) {
-            if (typeof window !== 'undefined' && window.localAuth) {
-                return window.localAuth.getCurrentUser(token);
-            }
-            throw new Error('localAuth не ініціалізовано. Переконайтеся, що localApi.js завантажено.');
+            return localAuth.getCurrentUser(token);
         }
         try {
             const response = await fetch(`${API_BASE_URL}/auth/me`, {
@@ -174,7 +151,7 @@ const api = {
     async createKnowledgeCategory(data) {
         if (USE_LOCAL_DB) {
             const token = this.getToken();
-            const userData = await window.localAuth.getCurrentUser(token);
+            const userData = await localAuth.getCurrentUser(token);
             return localKnowledge.createCategory(data);
         }
         const token = this.getToken();
@@ -208,7 +185,7 @@ const api = {
     async createKnowledgeMaterial(data) {
         if (USE_LOCAL_DB) {
             const token = this.getToken();
-            const userData = await window.localAuth.getCurrentUser(token);
+            const userData = await localAuth.getCurrentUser(token);
             return localKnowledge.createMaterial(data, userData.user.id);
         }
         const token = this.getToken();
@@ -241,7 +218,7 @@ const api = {
     async getCourses() {
         if (USE_LOCAL_DB) {
             const token = this.getToken();
-            const userData = await window.localAuth.getCurrentUser(token);
+            const userData = await localAuth.getCurrentUser(token);
             if (typeof window !== 'undefined' && window.localCourses) {
                 return window.localCourses.getCourses(userData.user.role);
             } else {
@@ -261,7 +238,7 @@ const api = {
     async createCourse(data) {
         if (USE_LOCAL_DB) {
             const token = this.getToken();
-            const userData = await window.localAuth.getCurrentUser(token);
+            const userData = await localAuth.getCurrentUser(token);
             if (typeof window !== 'undefined' && window.localCourses) {
                 return window.localCourses.createCourse(data, userData.user.id);
             } else {
@@ -283,7 +260,7 @@ const api = {
     async getProfile() {
         if (USE_LOCAL_DB) {
             const token = this.getToken();
-            const userData = await window.localAuth.getCurrentUser(token);
+            const userData = await localAuth.getCurrentUser(token);
             return localProfile.getProfile(userData.user.id);
         }
         const token = this.getToken();
@@ -691,7 +668,7 @@ const api = {
     async addCourseMaterial(courseId, materialId) {
         if (USE_LOCAL_DB) {
             const token = this.getToken();
-            const userData = await window.localAuth.getCurrentUser(token);
+            const userData = await localAuth.getCurrentUser(token);
             if (typeof window !== 'undefined' && window.localCourses) {
                 return window.localCourses.addCourseMaterial(courseId, materialId);
             } else {
@@ -827,22 +804,6 @@ const api = {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
-        });
-    },
-
-    async createUnit(data) {
-        if (USE_LOCAL_DB) {
-            // TODO: Реалізувати для локальної версії
-            return { success: true, data: { id: Date.now(), ...data } };
-        }
-        const token = this.getToken();
-        return fetch(`${API_BASE_URL}/units`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
         });
     },
 
@@ -1163,7 +1124,7 @@ const api = {
             
             // Спеціальна обробка помилок підключення до БД
             if (data.message && (data.message.includes('password authentication') || data.message.includes('бази даних'))) {
-                errorMessage += '\n\n💡 Альтернатива: Використайте локальну БД - змініть USE_LOCAL_DB = true в app/scripts/api.js';
+                errorMessage += '\n\n💡 Альтернатива: Використайте локальну БД - змініть USE_LOCAL_DB = true в frontend/app/scripts/api.js';
             }
             
             throw new Error(errorMessage);

@@ -134,19 +134,6 @@ function checkUserRole() {
         if (crewsTab) crewsTab.style.display = 'block';
         if (equipmentTab) equipmentTab.style.display = 'block';
     }
-    
-    // Оновлюємо кнопки дій для поточної секції (якщо функція доступна)
-    if (typeof updateActionButtons === 'function') {
-        // Отримуємо поточну активну секцію
-        const activeSection = document.querySelector('.section.active');
-        if (activeSection) {
-            const currentSectionId = activeSection.id;
-            updateActionButtons(currentSectionId);
-        } else {
-            // Якщо немає активної секції, оновлюємо для профілю за замовчуванням
-            updateActionButtons('profile');
-        }
-    }
 }
 
 // Вхід
@@ -192,7 +179,7 @@ async function handleLogin(event) {
         if (error.message && error.message.includes('Не удалось подключиться к серверу')) {
             errorMessage = 'Помилка підключення до сервера. Перевірте чи запущений backend сервер на порту 3000.\n\nДля запуску: cd backend && npm start';
         } else if (error.message && error.message.includes('password authentication')) {
-            errorMessage = 'Помилка підключення до бази даних.\n\n💡 Рішення:\n1. Перевірте пароль PostgreSQL в backend/.env\n2. Або використайте локальну БД: змініть USE_LOCAL_DB = true в app/scripts/api.js';
+            errorMessage = 'Помилка підключення до бази даних.\n\n💡 Рішення:\n1. Перевірте пароль PostgreSQL в backend/.env\n2. Або використайте локальну БД: змініть USE_LOCAL_DB = true в frontend/app/scripts/api.js';
         } else if (error.message && error.message.includes('бази даних')) {
             errorMessage = error.message;
         } else if (error.message) {

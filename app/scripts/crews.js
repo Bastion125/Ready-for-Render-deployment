@@ -2,36 +2,11 @@
 
 let crewsList = [];
 
-// Функція для екранування HTML
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-/**
- * Завантаження екіпажів
- * @async
- */
+// Завантаження екіпажів
 async function loadCrews() {
-    const list = typeof getCachedElement === 'function' 
-        ? getCachedElement('crewsList') 
-        : document.getElementById('crewsList');
-    if (!list) {
-        console.error('crewsList element not found');
-        return;
-    }
+    const content = document.getElementById('crewsContent');
+    if (!content) return;
 
-    // Показуємо skeleton loading
-    list.innerHTML = `
-        <div class="skeleton-loading">
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-        </div>
-    `;
-    
     try {
         const response = await api.getCrews();
         const data = await api.handleResponse(response);
@@ -40,99 +15,58 @@ async function loadCrews() {
         renderCrews(crewsList);
     } catch (error) {
         console.error('Error loading crews:', error);
-        if (list) {
-            list.innerHTML = '<div class="empty-state">Помилка завантаження екіпажів</div>';
-        }
+        content.innerHTML = '<div class="empty-state">Помилка завантаження екіпажів</div>';
     }
 }
 
-/**
- * Відображення екіпажів
- * @param {Array} crews - Масив екіпажів
- */
+// Відображення екіпажів
 function renderCrews(crews) {
-    const list = typeof getCachedElement === 'function' 
-        ? getCachedElement('crewsList') 
-        : document.getElementById('crewsList');
-    if (!list) {
-        console.error('crewsList not found');
-        return;
-    }
-
-    if (!crews || !Array.isArray(crews)) {
-        list.innerHTML = '<div class="empty-state">Помилка: некоректні дані екіпажів</div>';
-        return;
-    }
+    const content = document.getElementById('crewsContent');
+    if (!content) return;
 
     if (crews.length === 0) {
-        list.innerHTML = '<div class="empty-state">Екіпажі відсутні. Натисніть "Створити картку" для додавання екіпажу.</div>';
+        content.innerHTML = '<div class="empty-state">Екіпажі відсутні</div>';
         return;
     }
 
-    try {
-        list.innerHTML = `
-            <div class="crews-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
-                ${crews.map(crew => {
-                    const crewName = crew.name || 'Без назви';
-                    const crewUavType = crew.uav_type || 'Не вказано';
-                    const membersCount = crew.members_count || (crew.members ? crew.members.length : 0);
-                    const crewAvatar = crew.avatar_data || crew.avatar_path || '';
-                    
-                    return `
-                        <div class="crew-card" onclick="openCrewCard(${crew.id})" style="cursor: pointer; background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%); border: 2px solid var(--primary); border-radius: 12px; padding: 20px; transition: all 0.3s ease; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);">
-                            ${crewAvatar ? `
-                                <div class="crew-avatar" style="text-align: center; margin-bottom: 15px;">
-                                    <img src="${crewAvatar.startsWith('data:') ? crewAvatar : (crewAvatar.startsWith('http') ? crewAvatar : 'data:image/jpeg;base64,' + crewAvatar)}" 
-                                         alt="${escapeHtml(crewName)}" 
-                                         style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid var(--primary); object-fit: contain;"
-                                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'width: 150px; height: 150px; background: rgba(230, 168, 87, 0.1); border-radius: 8px; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 48px;\\'>🚁</div>'">
-                                </div>
-                            ` : ''}
-                            <h3 style="color: var(--primary); margin-bottom: 10px;">${escapeHtml(crewName)}</h3>
-                            <p style="color: var(--text-light); margin: 5px 0;"><strong>Тип БПЛА:</strong> ${escapeHtml(crewUavType)}</p>
-                            <p style="color: var(--text-light); margin: 5px 0;"><strong>Членів:</strong> ${membersCount}</p>
-                            ${crew.members && Array.isArray(crew.members) && crew.members.length > 0 ? `
-                                <div class="crew-members-preview" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(230, 168, 87, 0.2);">
-                                    <strong style="color: var(--primary); font-size: 12px;">Члени екіпажу:</strong>
-                                    <ul class="crew-members-list" style="margin-top: 5px; padding-left: 20px; font-size: 12px; color: var(--text-light);">
-                                        ${crew.members.map(member => `
-                                            <li style="margin: 3px 0;">${escapeHtml(member.full_name || 'Невідомо')} ${member.role ? `<span style="color: var(--primary-dark);">(${escapeHtml(member.role)})</span>` : ''}</li>
-                                        `).join('')}
-                                    </ul>
-                                </div>
-                            ` : '<p style="color: var(--text-muted); margin-top: 10px; font-size: 12px;">Члени екіпажу не додані</p>'}
-                            <div class="crew-actions" style="margin-top: 15px; display: flex; gap: 10px;">
-                                <button class="btn-primary btn-small" onclick="event.stopPropagation(); editCrew(${crew.id})">Редагувати</button>
-                                <button class="btn-secondary btn-small" onclick="event.stopPropagation(); viewCrewDetails(${crew.id})">Деталі</button>
-                                <button class="btn-danger btn-small" onclick="event.stopPropagation(); deleteCrew(${crew.id})">Видалити</button>
-                            </div>
+    content.innerHTML = `
+        <div class="section-actions">
+            <button class="btn-primary" onclick="showAddCrewModal()">
+                ➕ Додати екіпаж
+            </button>
+        </div>
+        <div class="crews-grid">
+            ${crews.map(crew => `
+                <div class="crew-card">
+                    ${crew.avatar_path || crew.avatar_data ? `
+                        <div class="crew-avatar" style="text-align: center; margin-bottom: 15px;">
+                            <img src="${crew.avatar_data ? (typeof formatDataUrl === 'function' ? formatDataUrl(crew.avatar_data, 'image/jpeg') : (crew.avatar_data.startsWith('data:') ? crew.avatar_data : 'data:image/jpeg;base64,' + crew.avatar_data)) : crew.avatar_path}" 
+                                 alt="${crew.name}" 
+                                 style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid var(--primary);">
                         </div>
-                    `;
-                }).join('')}
-            </div>
-        `;
-        
-        // Використовуємо DocumentFragment для оптимізації
-        if (typeof createFragmentFromHTML === 'function') {
-            const fragment = createFragmentFromHTML(crewsHtml);
-            list.innerHTML = '';
-            list.appendChild(fragment);
-        } else {
-            list.innerHTML = crewsHtml;
-        }
-    } catch (error) {
-        console.error('Error rendering crews:', error);
-        list.innerHTML = `<div class="empty-state">Помилка відображення екіпажів: ${error.message || 'невідома помилка'}</div>`;
-    }
-}
-
-// Відкриття картки екіпажу
-function openCrewCard(crewId) {
-    if (typeof viewCrewDetails === 'function') {
-        viewCrewDetails(crewId);
-    } else if (typeof editCrew === 'function') {
-        editCrew(crewId);
-    }
+                    ` : ''}
+                    <h3>${crew.name}</h3>
+                    <p><strong>Тип БПЛА:</strong> ${crew.uav_type}</p>
+                    <p><strong>Членів:</strong> ${crew.members_count || 0}</p>
+                    ${crew.members && crew.members.length > 0 ? `
+                        <div class="crew-members-preview">
+                            <strong>Члени екіпажу:</strong>
+                            <ul class="crew-members-list">
+                                ${crew.members.map(member => `
+                                    <li>${member.full_name || 'Невідомо'} ${member.role ? `(${member.role})` : ''}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : '<p class="text-muted">Члени екіпажу не додані</p>'}
+                    <div class="crew-actions">
+                        <button class="btn-primary btn-small" onclick="editCrew(${crew.id})">Редагувати</button>
+                        <button class="btn-secondary btn-small" onclick="viewCrewDetails(${crew.id})">Деталі</button>
+                        <button class="btn-danger btn-small" onclick="deleteCrew(${crew.id})">Видалити</button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
 // Модальне вікно створення/редагування екіпажу
@@ -491,24 +425,11 @@ async function viewCrewDetails(crewId) {
 if (typeof window !== 'undefined') {
     window.loadCrews = loadCrews;
     window.showAddCrewModal = showAddCrewModal;
-    
-    // Показуємо форму в модальному вікні замість прямо на сторінці
-    const originalShowAddCrewModal = showAddCrewModal;
-    window.showAddCrewModal = async function(crewId = null) {
-        // Приховуємо форму на сторінці якщо вона видима
-        const formCard = document.getElementById('crewFormCard');
-        if (formCard) {
-            formCard.style.display = 'none';
-        }
-        // Показуємо модальне вікно
-        await originalShowAddCrewModal(crewId);
-    };
     window.handleAddCrew = handleAddCrew;
     window.editCrew = editCrew;
     window.deleteCrew = deleteCrew;
     window.viewCrewDetails = viewCrewDetails;
     window.addCrewMember = addCrewMember;
-    window.openCrewCard = openCrewCard;
     // closeModal та showNotification експортуються в auth.js
 }
 

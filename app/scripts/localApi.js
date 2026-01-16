@@ -1,24 +1,9 @@
 // Локальний API для роботи з SQL.js замість backend сервера
 
-// Функція для отримання екземпляра БД
-function getDb() {
-    // Спочатку перевіряємо локальну змінну db (якщо вона доступна в цьому контексті)
-    if (typeof db !== 'undefined' && db !== null) {
-        return db;
-    }
-    // Потім перевіряємо глобальну змінну window.db напряму (без рекурсії)
-    if (typeof window !== 'undefined' && window.db !== null && window.db !== undefined) {
-        return window.db;
-    }
-    // Якщо БД не ініціалізована, викидаємо помилку з підказкою
-    throw new Error('База даних не ініціалізована. Переконайтеся, що initDatabase() викликано перед використанням API.');
-}
-
 // Автентифікація
 const localAuth = {
     async register(data) {
         const { full_name, email, password } = data;
-        const db = getDb();
         
         // Перевірка чи існує користувач
         const stmt = db.prepare("SELECT id FROM users WHERE email = ?");
@@ -72,14 +57,13 @@ const localAuth = {
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 7);
         
-        const dbInstance = getDb();
-        dbInstance.run(
+        db.run(
             "INSERT INTO sessions (user_id, session_token, expires_at) VALUES (?, ?, ?)",
             [user.id, token, expiresAt.toISOString()]
         );
         
         // Оновлення last_login
-        dbInstance.run(
+        db.run(
             "UPDATE users SET last_login = datetime('now'), last_activity = datetime('now') WHERE id = ?",
             [user.id]
         );
@@ -95,7 +79,6 @@ const localAuth = {
     
     async login(data) {
         const { email, password } = data;
-        const db = getDb();
         
         // Пошук користувача
         const stmt = db.prepare("SELECT id, full_name, email, password_hash, role, is_active FROM users WHERE email = ?");
@@ -149,7 +132,6 @@ const localAuth = {
     },
     
     async logout(token) {
-        const db = getDb();
         if (token) {
             const stmt = db.prepare("DELETE FROM sessions WHERE session_token = ?");
             stmt.run([token]);
@@ -163,7 +145,6 @@ const localAuth = {
         if (!token) {
             throw new Error('Токен відсутній');
         }
-        const db = getDb();
         
         // Перевірка сесії
         const sessionStmt = db.prepare("SELECT user_id, expires_at FROM sessions WHERE session_token = ? AND expires_at > datetime('now')");
@@ -195,7 +176,7 @@ const localAuth = {
 
         // Оновлюємо last_activity користувача для коректного відображення в адмінці
         try {
-            const updateUserStmt = getDb().prepare("UPDATE users SET last_activity = datetime('now') WHERE id = ?");
+            const updateUserStmt = db.prepare("UPDATE users SET last_activity = datetime('now') WHERE id = ?");
             updateUserStmt.run([userId]);
             updateUserStmt.free();
         } catch (e) {
@@ -218,7 +199,6 @@ const localAuth = {
 // База знань
 const localKnowledge = {
     async getCategories() {
-        const db = getDb();
         const result = db.exec("SELECT * FROM knowledge_categories ORDER BY order_index, name");
         const categories = result.length > 0 && result[0] ? result[0].values.map(row => ({
             id: row[0],
@@ -233,7 +213,6 @@ const localKnowledge = {
     },
     
     async getMaterials(categoryId = null) {
-        const db = getDb();
         let query = "SELECT * FROM knowledge_materials WHERE is_published = 1";
         
         if (categoryId) {
@@ -267,7 +246,6 @@ const localKnowledge = {
     },
     
     async createMaterial(data, userId) {
-        const db = getDb();
         const { category_id, title, content, material_type, file_path, file_size, mime_type, avatar_path, avatar_data } = data;
         
         // Перевірка наявності колонок avatar_path та avatar_data
@@ -1246,28 +1224,21 @@ const localCrews = {
     
     async getCrews() {
         try {
-            // Перевірка наявності БД
-            const dbInstance = getDb();
-            if (!dbInstance) {
-                console.warn('Database not initialized, returning empty crews list');
-                return { success: true, data: [] };
-            }
-            
             // Переконатися, що таблиці існують
             this.ensureTables();
             
-            const result = dbInstance.exec("SELECT * FROM crews ORDER BY created_at DESC");
+            const result = db.exec("SELECT * FROM crews ORDER BY created_at DESC");
             const crews = result.length > 0 && result[0] ? result[0].values.map(row => {
                 const crewId = row[0];
                 let membersCount = 0;
                 let members = [];
                 
                 try {
-                    const membersResult = dbInstance.exec("SELECT COUNT(*) FROM crew_members WHERE crew_id = " + crewId);
+                    const membersResult = db.exec("SELECT COUNT(*) FROM crew_members WHERE crew_id = " + crewId);
                     membersCount = membersResult[0]?.values[0]?.[0] || 0;
                     
                     // Отримуємо список членів
-                    const membersListResult = dbInstance.exec(`
+                    const membersListResult = db.exec(`
                         SELECT cm.personnel_id, cm.role, p.full_name, p.position, p.rank
                         FROM crew_members cm
                         LEFT JOIN personnel p ON cm.personnel_id = p.id
@@ -1618,19 +1589,12 @@ const localEquipmentTypes = {
 const localEquipment = {
     async getEquipment() {
         try {
-            // Перевірка наявності БД
-            const dbInstance = getDb();
-            if (!dbInstance) {
-                console.warn('Database not initialized, returning empty equipment list');
-                return { success: true, data: [] };
-            }
-            
             // Спочатку перевіряємо структуру таблиці та мігруємо якщо потрібно
             // Таблиця equipment вже створена в схемі БД
             
             // Спробуємо запит з type_id
             try {
-                const result = dbInstance.exec(`
+                const result = db.exec(`
                     SELECT e.*, et.name as type_name 
                     FROM equipment e
                     LEFT JOIN equipment_types et ON e.type_id = et.id
@@ -1659,11 +1623,7 @@ const localEquipment = {
             } catch (joinError) {
                 // Якщо JOIN не працює, використовуємо простий SELECT
                 console.warn('JOIN query failed, using simple SELECT:', joinError);
-                const dbInstance = getDb();
-                if (!dbInstance) {
-                    return { success: true, data: [] };
-                }
-                const result = dbInstance.exec("SELECT * FROM equipment ORDER BY created_at DESC");
+                const result = db.exec("SELECT * FROM equipment ORDER BY created_at DESC");
                 const equipment = result.length > 0 && result[0] ? result[0].values.map(row => ({
                     id: row[0],
                     name: row[1],
@@ -1832,16 +1792,9 @@ const localEquipment = {
 const localPersonnel = {
     async getPersonnel() {
         try {
-            // Перевірка наявності БД
-            const dbInstance = getDb();
-            if (!dbInstance) {
-                console.warn('Database not initialized, returning empty personnel list');
-                return { success: true, data: [] };
-            }
-            
             // Спробуємо запит з JOIN для отримання назви підрозділу
             try {
-                const result = dbInstance.exec(`
+                const result = db.exec(`
                     SELECT p.*, u.name as unit_name 
                     FROM personnel p
                     LEFT JOIN units u ON p.unit_id = u.id
@@ -1870,11 +1823,7 @@ const localPersonnel = {
             } catch (joinError) {
                 // Якщо JOIN не працює, використовуємо простий SELECT
                 console.warn('JOIN query failed, using simple SELECT:', joinError);
-                const dbInstance = getDb();
-                if (!dbInstance) {
-                    return { success: true, data: [] };
-                }
-                const result = dbInstance.exec("SELECT * FROM personnel ORDER BY full_name");
+                const result = db.exec("SELECT * FROM personnel ORDER BY full_name");
                 const personnel = result.length > 0 && result[0] ? result[0].values.map(row => ({
                     id: row[0],
                     shpk: row[1] || null,

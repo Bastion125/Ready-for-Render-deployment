@@ -115,33 +115,17 @@ async function migrateFromLocalStorage() {
 // Ініціалізація бази даних
 async function initDatabase() {
     try {
-        // Перевірка чи БД вже ініціалізована
-        if (db !== null && db !== undefined) {
-            try {
-                // Перевіряємо чи БД дійсно працює
-                db.exec("SELECT 1");
-                console.log('База даних вже ініціалізована');
-                return true;
-            } catch (e) {
-                // БД не працює, потрібно переініціалізувати
-                console.warn('База даних існує, але не працює. Переініціалізація...');
-                db = null;
-            }
-        }
-        
         console.log('Ініціалізація локальної бази даних...');
         
         // Завантаження SQL.js
         if (typeof initSqlJs === 'undefined') {
             console.error('SQL.js не завантажено');
-            if (typeof showNotification === 'function') {
-                showNotification('Помилка: SQL.js не завантажено. Перезавантажте сторінку.', 'error');
-            }
+            showNotification('Помилка: SQL.js не завантажено. Перезавантажте сторінку.', 'error');
             return false;
         }
         
         SQL = await initSqlJs({
-            locateFile: file => `https://unpkg.com/sql.js@1.8.0/dist/${file}`
+            locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
         });
         
         if (!SQL) {
@@ -194,44 +178,29 @@ async function initDatabase() {
         // Увімкнути FOREIGN KEY constraints
         db.run("PRAGMA foreign_keys = ON");
         
-        // Створити таблиці якщо їх немає (чекаємо завершення)
-        await createTables();
-        
-        // Оновлюємо глобальну змінну для сумісності
-        if (typeof window !== 'undefined') {
-            window.db = db;
-        }
+        // Створити таблиці якщо їх немає
+        createTables();
         
         // Автоматичне збереження при змінах
         setupAutoSave();
         
-        console.log('База даних успішно ініціалізована та готова до використання');
+        console.log('База даних готова');
         return true;
     } catch (error) {
         console.error('Помилка ініціалізації БД:', error);
-        console.error('Stack trace:', error.stack);
-        if (typeof showNotification === 'function') {
-            showNotification('Помилка ініціалізації бази даних: ' + (error.message || 'невідома помилка'), 'error');
-        }
-        // Скидаємо db на null у разі помилки
-        db = null;
-        if (typeof window !== 'undefined') {
-            window.db = null;
-        }
+        showNotification('Помилка ініціалізації бази даних', 'error');
         return false;
     }
 }
 
 // Створення таблиць
-async function createTables() {
+function createTables() {
     if (!db) return;
     
     try {
         // Перевірка чи існують таблиці
         db.exec("SELECT COUNT(*) FROM users");
         console.log('Таблиці вже існують');
-        // Перевіряємо чи є адмін, якщо ні - створюємо
-        await createSystemAdmin().catch(e => console.error('Помилка створення адміністратора:', e));
         return;
     } catch (e) {
         console.log('Створення таблиць...');
@@ -241,10 +210,10 @@ async function createTables() {
     const schema = getDatabaseSchema();
     db.exec(schema);
     
-    // Створити системного адміністратора (чекаємо завершення)
-    await createSystemAdmin().catch(e => console.error('Помилка створення адміністратора:', e));
+    // Створити системного адміністратора (асинхронно)
+    createSystemAdmin().catch(e => console.error('Помилка створення адміністратора:', e));
     
-    // Створити тестових людей (асинхронно, не блокуємо)
+    // Створити тестових людей (асинхронно)
     createTestPersonnel().catch(e => console.error('Помилка створення тестового персоналу:', e));
     
     console.log('Таблиці створено');

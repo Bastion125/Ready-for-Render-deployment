@@ -1,69 +1,6 @@
 // Main application logic
 
-/**
- * Оновлення кнопок дій для секції
- * @param {string} sectionId - ID секції
- */
-function updateActionButtons(sectionId) {
-    // Отримуємо поточного користувача
-    const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-    
-    // Використовуємо кешовані елементи
-    const getElement = typeof getCachedElement === 'function' 
-        ? getCachedElement 
-        : document.getElementById.bind(document);
-    
-    if (!currentUser) {
-        // Якщо користувач не знайдений, приховуємо всі кнопки
-        const addPersonnelBtn = getElement('addPersonnelBtn');
-        const addCrewBtn = getElement('addCrewBtn');
-        const addEquipmentBtn = getElement('addEquipmentBtn');
-        if (addPersonnelBtn) addPersonnelBtn.style.display = 'none';
-        if (addCrewBtn) addCrewBtn.style.display = 'none';
-        if (addEquipmentBtn) addEquipmentBtn.style.display = 'none';
-        return;
-    }
-    
-    // Перевіряємо роль - кнопки доступні для Readit, Admin, SystemAdmin
-    const hasAccess = typeof canCreateContent === 'function' 
-        ? canCreateContent(currentUser)
-        : (currentUser && (currentUser.role === 'Readit' || currentUser.role === 'Admin' || currentUser.role === 'SystemAdmin'));
-    
-    // Оновлюємо кнопки в залежності від секції
-    const addPersonnelBtn = getElement('addPersonnelBtn');
-    const addCrewBtn = getElement('addCrewBtn');
-    const addEquipmentBtn = getElement('addEquipmentBtn');
-    
-    if (sectionId === 'personnel') {
-        if (addPersonnelBtn) {
-            addPersonnelBtn.style.display = hasAccess ? 'inline-block' : 'none';
-        }
-    } else {
-        if (addPersonnelBtn) addPersonnelBtn.style.display = 'none';
-    }
-    
-    if (sectionId === 'crews') {
-        if (addCrewBtn) {
-            addCrewBtn.style.display = hasAccess ? 'inline-block' : 'none';
-        }
-    } else {
-        if (addCrewBtn) addCrewBtn.style.display = 'none';
-    }
-    
-    if (sectionId === 'equipment') {
-        if (addEquipmentBtn) {
-            addEquipmentBtn.style.display = hasAccess ? 'inline-block' : 'none';
-        }
-    } else {
-        if (addEquipmentBtn) addEquipmentBtn.style.display = 'none';
-    }
-}
-
-/**
- * Перемикання секцій
- * @param {string} sectionId - ID секції для відображення
- * @param {HTMLElement} tabElement - Елемент вкладки
- */
+// Перемикання секцій
 function showSection(sectionId, tabElement) {
     // Приховати всі секції
     document.querySelectorAll('.section').forEach(section => {
@@ -86,21 +23,14 @@ function showSection(sectionId, tabElement) {
 
     // Завантажити контент секції
     loadSectionContent(sectionId);
-    
-    // Оновити кнопки дій для поточної секції
-    updateActionButtons(sectionId);
 }
 
 // Експорт критичних функцій одразу (до завантаження інших скриптів)
 if (typeof window !== 'undefined') {
     window.showSection = showSection;
-    window.updateActionButtons = updateActionButtons;
 }
 
-/**
- * Завантаження контенту секції
- * @param {string} sectionId - ID секції
- */
+// Завантаження контенту секції
 function loadSectionContent(sectionId) {
     switch (sectionId) {
         case 'profile':
@@ -316,7 +246,7 @@ async function loadProfile() {
             return status === 'completed';
         });
         
-        // Курси в процесі - ті що мають прогрес або були початі але НЕ завершені
+        // Курси в процесі - ті що мають прогрес але НЕ завершені
         // ВАЖЛИВО: спочатку перевіряємо що курс НЕ завершений
         const inProgressCourses = allCourses.filter(c => {
             const status = String(c.status || '').toLowerCase();
@@ -327,22 +257,7 @@ async function loadProfile() {
             // Курс в процесі якщо:
             // 1. Статус in_progress або assigned
             // 2. АБО є прогрес (progress > 0)
-            // 3. АБО є started_at (курс був початий) - перевіряємо різні формати
-            // 4. АБО є user_course_id (є запис про проходження)
-            // 5. АБО є userCourseId (альтернативна назва)
-            // 6. АБО є user_course (об'єкт з даними про проходження)
-            const hasStarted = c.started_at !== null && c.started_at !== undefined && c.started_at !== '';
-            const hasUserCourseId = (c.user_course_id !== null && c.user_course_id !== undefined) ||
-                                   (c.userCourseId !== null && c.userCourseId !== undefined);
-            const hasUserCourse = c.user_course !== null && c.user_course !== undefined;
-            const hasProgress = (c.progress || 0) > 0;
-            
-            return status === 'in_progress' || 
-                   status === 'assigned' || 
-                   hasProgress ||
-                   hasStarted ||
-                   hasUserCourseId ||
-                   hasUserCourse;
+            return status === 'in_progress' || status === 'assigned' || (c.progress || 0) > 0;
         });
         
         // Доступні курси - всі інші (без прогресу і не завершені)
@@ -406,7 +321,7 @@ async function loadProfile() {
                     ${completedCourses.length > 0 ? `
                         <div class="courses-list">
                             ${completedCourses.map(course => `
-                                <div class="course-item completed">
+                                <div class="course-item">
                                     <div class="course-info">
                                         <h4>${course.title || 'Курс'}</h4>
                                         <p>Прогрес: ${course.progress || 0}%</p>
@@ -423,7 +338,7 @@ async function loadProfile() {
                     ${inProgressCourses.length > 0 ? `
                         <div class="courses-list">
                             ${inProgressCourses.map(course => `
-                                <div class="course-item in-progress">
+                                <div class="course-item">
                                     <div class="course-info">
                                         <h4>${course.title || 'Курс'}</h4>
                                         <div class="progress-bar">
@@ -442,10 +357,10 @@ async function loadProfile() {
                     ${availableCourses.length > 0 ? `
                         <div class="courses-list">
                             ${availableCourses.map(course => `
-                                <div class="course-item available">
+                                <div class="course-item">
                                     <div class="course-info">
                                         <h4>${course.title || 'Курс'}</h4>
-                                        <button class="btn-primary btn-small" onclick="if (typeof startCourseFromView === 'function') startCourseFromView(${course.id}); else if (typeof startCourse === 'function') startCourse(${course.id}); else showNotification('Функція початку курсу не доступна', 'error');">Почати курс</button>
+                                        <button class="btn-primary btn-small" onclick="startCourse(${course.id})">Почати курс</button>
                                     </div>
                                 </div>
                             `).join('')}
@@ -821,25 +736,12 @@ async function openCourseOld(id) {
 // Початок курсу
 async function startCourse(courseId) {
     try {
-        // Використовуємо функцію з courses.js якщо доступна
-        if (typeof startCourseFromView === 'function') {
-            await startCourseFromView(courseId);
-            // Перезавантажуємо профіль для оновлення списку курсів
-            await loadProfile();
-        } else {
-            // Fallback - спробуємо через API
-            const response = await api.startCourse(courseId);
-            const data = await api.handleResponse(response);
-            
-            if (data.success) {
-                showNotification('Курс розпочато', 'success');
-                // Перезавантажуємо профіль
-                await loadProfile();
-            }
-        }
+        // Тут можна додати логіку початку курсу
+        showNotification('Курс розпочато', 'success');
+        closeModal('courseModal');
     } catch (error) {
         console.error('Error starting course:', error);
-        showNotification('Помилка початку курсу: ' + (error.message || 'невідома помилка'), 'error');
+        showNotification('Помилка початку курсу', 'error');
     }
 }
 
@@ -1138,37 +1040,3 @@ if (typeof window !== 'undefined') {
     
     // closeModal та showNotification експортуються в auth.js
 }
-
-/**
- * Перемикає відображення меню (відкриває/закриває)
- */
-function toggleMenu() {
-    const menuWrapper = document.querySelector('.menu-wrapper');
-    const toggleBtn = document.getElementById('toggleMenu');
-    if (!menuWrapper || !toggleBtn) return;
-    
-    const iconOpen = toggleBtn.querySelector('.icon-open');
-    const iconClose = toggleBtn.querySelector('.icon-close');
-    
-    const isOpen = menuWrapper.classList.contains('is-open');
-    if (isOpen) {
-        // Закриваємо меню
-        menuWrapper.classList.remove('is-open');
-        menuWrapper.setAttribute('aria-hidden', 'true');
-        if (iconOpen) iconOpen.style.display = 'flex';
-        if (iconClose) iconClose.style.display = 'none';
-        // Розблоковуємо прокрутку body
-        document.body.style.overflow = '';
-    } else {
-        // Відкриваємо меню
-        menuWrapper.classList.add('is-open');
-        menuWrapper.setAttribute('aria-hidden', 'false');
-        if (iconOpen) iconOpen.style.display = 'none';
-        if (iconClose) iconClose.style.display = 'flex';
-        // Блокуємо прокрутку body
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-// Експортуємо функцію глобально
-window.toggleMenu = toggleMenu;
