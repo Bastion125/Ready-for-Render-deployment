@@ -1007,7 +1007,25 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
 
     </div>
 
-    <!-- Основний контент -->
+    <!-- Екран автентифікації для Training System -->
+    <div id="authScreenTS" class="auth-screen" style="display: none;">
+        <div class="auth-screen-content">
+            <div class="heraldic-emblem-auth">
+                <img src="app/assets/logo.png" alt="Логотип" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            <h1 class="auth-screen-title">Training Recording System</h1>
+            <div class="auth-screen-subtitle">База знань та облік навченості</div>
+            <div class="auth-screen-buttons">
+                <button class="auth-screen-btn primary" onclick="showLoginModal()">
+                    🔐 Увійти
+                </button>
+                <button class="auth-screen-btn secondary" onclick="showRegisterModal()">
+                    📝 Реєстрація
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="mainContent" class="container" style="display: none;">
         <!-- Header -->
         <header class="app-header">
@@ -1110,17 +1128,10 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
         </div>
 
         <!-- Personnel (для Readit+) -->
-        <div id="personnel" class="section">
-            <div class="section-header">
-                <h2>Особовий склад</h2>
-                <button class="btn-primary" id="addPersonnelBtn" onclick="showAddPersonnelModal()">
-                    ➕ Створити картку
-                </button>
-            </div>
-            
-            <div class="form-card" id="personnelFormCard" style="display: none;">
+        <div id="personnel" class="section" style="display: none;">
+            <div class="form-card">
                 <div class="form-title">Додати військовослужбовця</div>
-                <form id="personnelForm" onsubmit="handlePersonnelForm(event); return false;">
+                <form id="personnelForm">
                     <input type="hidden" id="personnelId">
                     <div class="form-row">
                         <div class="form-group">
@@ -1194,14 +1205,6 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
             </div>
 
             <div class="filters">
-                <div class="filter-group" style="flex: 1; min-width: 300px;">
-                    <label>Пошук</label>
-                    <input type="text" 
-                           id="personnelSearch" 
-                           placeholder="🔍 Пошук за ПІБ, посадою, званням, підрозділом, ШПК..." 
-                           class="search-input"
-                           oninput="if (typeof filterPersonnel === 'function') filterPersonnel()">
-                </div>
                 <div class="filter-group">
                     <label>Рівень навченості</label>
                     <select id="filterLevel" onchange="applyPersonnelFilters()">
@@ -1271,15 +1274,8 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
         </div>
 
         <!-- Crews Section -->
-        <div id="crews" class="section">
-            <div class="section-header">
-                <h2>Екіпажі</h2>
-                <button class="btn-primary" id="addCrewBtn" onclick="showAddCrewModal()">
-                    ➕ Створити картку
-                </button>
-            </div>
-            
-            <div class="form-card" id="crewFormCard" style="display: none;">
+        <div id="crews" class="section" style="display: none;">
+            <div class="form-card">
                 <div class="form-title">Додати екіпаж</div>
                 <form id="crewForm">
                     <input type="hidden" id="crewId">
@@ -1315,15 +1311,8 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
         </div>
 
         <!-- Equipment Section -->
-        <div id="equipment" class="section">
-            <div class="section-header">
-                <h2>Засоби</h2>
-                <button class="btn-primary" id="addEquipmentBtn" onclick="showAddEquipmentModal()">
-                    ➕ Створити картку
-                </button>
-            </div>
-            
-            <div class="form-card" id="equipmentFormCard" style="display: none;">
+        <div id="equipment" class="section" style="display: none;">
+            <div class="form-card">
                 <div class="form-title">Додати засіб (БПЛА)</div>
                 <form id="equipmentForm">
                     <input type="hidden" id="equipmentId">
@@ -1355,9 +1344,8 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
                         <label>Зображення</label>
                         <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('equipmentImageInput').click()">
                             <p style="color: var(--primary); margin-bottom: 10px;">Натисніть або перетягніть зображення сюди</p>
-                            <input type="file" id="equipmentImageInput" accept="image/*" style="display: none;" onchange="if (typeof handleEquipmentPhotoSelect === 'function') handleEquipmentPhotoSelect(event); else if (typeof handleEquipmentImageUpload === 'function') handleEquipmentImageUpload(event);">
+                            <input type="file" id="equipmentImageInput" accept="image/*" style="display: none;" onchange="handleEquipmentImageUpload(event)">
                             <img id="equipmentImagePreview" class="image-preview" style="display: none;">
-                            <div id="equipmentPhotoPreview"></div>
                         </div>
                     </div>
                     <button type="submit">Зберегти</button>
@@ -1372,7 +1360,8 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
         </div>
     </div>
 
-    <!-- Модальні вікна -->
+    </div>
+
     <!-- Login Modal -->
     <div id="loginModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'loginModal')">
         <div class="modal-content auth-modal" onclick="event.stopPropagation()">
@@ -1472,15 +1461,6 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
     <!-- Notification -->
     <div id="notification" class="notification"></div>
 
-    <script>
-        // Виправлення помилок TLS при завантаженні ресурсів
-        (function() {
-            const protocol = window.location.protocol;
-            if (protocol === 'https:') {
-                console.warn('Сторінка відкрита через HTTPS. Для локальної розробки використовуйте HTTP або file:// протокол.');
-            }
-        })();
-    </script>
     <script src="https://unpkg.com/sql.js@1.8.0/dist/sql-wasm.js"></script>
     <script src="app/scripts/database.js"></script>
     <script src="app/scripts/localApi.js"></script>

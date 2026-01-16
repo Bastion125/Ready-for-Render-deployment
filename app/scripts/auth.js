@@ -41,14 +41,38 @@ async function checkAuth() {
 
 // Показати екран автентифікації
 function showAuthScreen() {
-    document.getElementById('authScreen').style.display = 'flex';
-    document.getElementById('mainContent').style.display = 'none';
+    const authScreen = document.getElementById('authScreen');
+    const authScreenTS = document.getElementById('authScreenTS');
+    const mainContent = document.getElementById('mainContent');
+    
+    // Якщо є authScreenTS (training.html), використовуємо його
+    if (authScreenTS) {
+        authScreenTS.style.display = 'flex';
+        if (authScreen) authScreen.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'none';
+    } else if (authScreen) {
+        // Стандартна поведінка для інших файлів
+        authScreen.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+    }
 }
 
 // Показати основний контент
 function showMainContent() {
-    document.getElementById('authScreen').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
+    const authScreen = document.getElementById('authScreen');
+    const authScreenTS = document.getElementById('authScreenTS');
+    const mainContent = document.getElementById('mainContent');
+    
+    // Якщо є authScreenTS (training.html), приховуємо його
+    if (authScreenTS) {
+        authScreenTS.style.display = 'none';
+        if (authScreen) authScreen.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+    } else if (authScreen) {
+        // Стандартна поведінка для інших файлів
+        authScreen.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+    }
 }
 
 // Оновити інформацію про користувача
