@@ -1,0 +1,253 @@
+// Prisma Schema для PostgreSQL (Supabase/Railway)
+// TDD підхід - спочатку тести, потім реалізація
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Ролі користувачів
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.Text
+  permissions Json? // JSON з дозволами
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("roles")
+}
+
+// Користувачі системи
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  roleId       Int       @map("role_id")
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLogin    DateTime? @map("last_login") @db.Timestamp
+  lastActivity DateTime? @map("last_activity") @db.Timestamp
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  role               Role                @relation(fields: [roleId], references: [id])
+  personnel          Personnel?
+  sessions           Session[]
+  knowledgeMaterials KnowledgeMaterial[]
+
+  @@index([email])
+  @@index([roleId])
+  @@map("users")
+}
+
+// Сесії
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  sessionToken String   @unique @map("session_token") @db.VarChar(255)
+  ipAddress    String?  @map("ip_address") @db.VarChar(45)
+  userAgent    String?  @map("user_agent") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  expiresAt    DateTime @map("expires_at")
+  lastActivity DateTime @default(now()) @map("last_activity")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionToken])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// Екіпажі
+model Crew {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  uavType   String?  @map("uav_type") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  personnel Personnel[]
+
+  @@map("crews")
+}
+
+// Особовий склад (згідно вимог)
+model Personnel {
+  id               Int      @id @default(autoincrement())
+  serviceNumber    String   @unique @map("service_number") @db.VarChar(50)
+  rank             String   @db.VarChar(100)
+  fullName         String   @map("full_name") @db.VarChar(255)
+  position         String   @db.VarChar(255)
+  unit             String   @db.VarChar(255) // NOTE: Наразі String, не FK до Unit
+  phone            String?  @db.VarChar(50)
+  combatZoneAccess Boolean  @default(false) @map("combat_zone_access")
+  crewId           Int?     @map("crew_id")
+  userId           Int?     @unique @map("user_id")
+  login            String?  @unique @db.VarChar(255)
+  passwordHash     String?  @map("password_hash") @db.VarChar(255)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  crew Crew? @relation(fields: [crewId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  courseAssignments CourseAssignment[]
+
+  @@index([serviceNumber])
+  @@index([crewId])
+  @@index([userId])
+  @@map("personnel")
+}
+
+// Курси
+model Course {
+  id                       Int      @id @default(autoincrement())
+  title                    String   @db.VarChar(255)
+  description              String?  @db.Text
+  content                  String?  @db.Text // JSON
+  testId                   Int?     @map("test_id")
+  createdBy                Int      @map("created_by")
+  isPublished              Boolean  @default(false) @map("is_published")
+  orderIndex               Int      @default(0) @map("order_index")
+  requiresPreviousCourseId Int?     @map("requires_previous_course_id")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  courseAssignments CourseAssignment[]
+  modules           CourseModule[]
+
+  @@index([createdBy])
+  @@index([isPublished])
+  @@index([requiresPreviousCourseId])
+  @@index([orderIndex])
+  @@map("courses")
+}
+
+// Призначення курсів (згідно вимог)
+model CourseAssignment {
+  id          Int      @id @default(autoincrement())
+  personnelId Int      @map("personnel_id")
+  courseId    Int      @map("course_id")
+  assignedBy  Int?     @map("assigned_by")
+  assignedAt  DateTime @default(now()) @map("assigned_at")
+  status      String   @default("assigned") @db.VarChar(50) // assigned, in_progress, completed, failed
+
+  personnel Personnel @relation(fields: [personnelId], references: [id], onDelete: Cascade)
+  course    Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([personnelId, courseId])
+  @@index([personnelId])
+  @@index([courseId])
+  @@index([status])
+  @@map("course_assignments")
+}
+
+// Модулі курсів
+model CourseModule {
+  id                       Int      @id @default(autoincrement())
+  courseId                 Int      @map("course_id")
+  title                    String   @db.VarChar(255)
+  description              String?  @db.Text
+  orderIndex               Int      @default(0) @map("order_index")
+  requiresPreviousModuleId Int?     @map("requires_previous_module_id")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId])
+  @@index([courseId, orderIndex])
+  @@map("course_modules")
+}
+
+// Уроки
+model Lesson {
+  id                       Int      @id @default(autoincrement())
+  moduleId                 Int      @map("module_id")
+  title                    String   @db.VarChar(255)
+  description              String?  @db.Text
+  contentType              String   @map("content_type") @db.VarChar(50) // text, video, pdf, mixed
+  textContent              String?  @map("text_content") @db.Text
+  videoPath                String?  @map("video_path") @db.VarChar(500)
+  pdfPath                  String?  @map("pdf_path") @db.VarChar(500)
+  minimumTimeSeconds       Int      @default(180) @map("minimum_time_seconds")
+  orderIndex               Int      @default(0) @map("order_index")
+  requiresPreviousLessonId Int?     @map("requires_previous_lesson_id")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  module CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@index([moduleId])
+  @@index([moduleId, orderIndex])
+  @@map("lessons")
+}
+
+// Засоби (БПЛА, обладнання)
+model Equipment {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  type         String   @db.VarChar(255)
+  manufacturer String?  @db.VarChar(255)
+  notes        String?  @db.Text
+  imagePath    String?  @map("image_path") @db.VarChar(500)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("equipment")
+}
+
+// Категорії Бази знань
+model KnowledgeCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  parentId    Int?     @map("parent_id")
+  orderIndex  Int      @default(0) @map("order_index")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  parent    KnowledgeCategory?  @relation("KnowledgeCategoryTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  KnowledgeCategory[] @relation("KnowledgeCategoryTree")
+  materials KnowledgeMaterial[]
+
+  @@index([parentId])
+  @@index([orderIndex])
+  @@map("knowledge_categories")
+}
+
+// Матеріали Бази знань
+model KnowledgeMaterial {
+  id           Int      @id @default(autoincrement())
+  categoryId   Int      @map("category_id")
+  title        String   @db.VarChar(500)
+  content      String?  @db.Text
+  materialType String   @map("material_type") @db.VarChar(50) // text, pdf, video
+  filePath     String?  @map("file_path") @db.VarChar(1000)
+  fileSize     Int?     @map("file_size")
+  mimeType     String?  @map("mime_type") @db.VarChar(255)
+  avatarPath   String?  @map("avatar_path") @db.VarChar(1000)
+  createdBy    Int      @map("created_by")
+  isPublished  Boolean  @default(true) @map("is_published")
+  orderIndex   Int      @default(0) @map("order_index")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  category KnowledgeCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author   User              @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+  @@index([createdBy])
+  @@index([isPublished])
+  @@index([orderIndex])
+  @@map("knowledge_materials")
+}

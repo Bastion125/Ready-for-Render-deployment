@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.quilljs.com https://www.gstatic.com https://www.google.com; script-src-elem 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.quilljs.com https://www.gstatic.com https://www.google.com; script-src-attr 'unsafe-hashes'; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com; connect-src 'self' http://localhost:* http://127.0.0.1:* https://localhost:* https://127.0.0.1:* https://cdnjs.cloudflare.com https://unpkg.com https://www.google.com; img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob: https://cdnjs.cloudflare.com https://unpkg.com; frame-src 'self' https://www.google.com https://www.gstatic.com;">
+    <title>Вхід / Реєстрація - 125 окрема важка механізована бригада</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/style.min.css">
+    <link rel="icon" href="images/favicon.png" sizes="32x32">
+    <style>
+        body {
+            background: linear-gradient(135deg, #111A0B 0%, #0e3535 100%);
+            min-height: 100vh;
+            font-family: 'UAFSans-Regular', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .login-container {
+            max-width: 500px;
+            margin: 80px auto;
+            padding: 40px;
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(246, 146, 30, 0.3);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #F6921E;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .login-header p {
+            color: #D6B588;
+            font-size: 16px;
+        }
+        
+        .form-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(246, 146, 30, 0.3);
+        }
+        
+        .form-tab {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            color: #D6B588;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .form-tab.active {
+            color: #F6921E;
+            border-bottom-color: #F6921E;
+            font-weight: bold;
+        }
+        
+        .form-tab:hover {
+            color: #F6921E;
+        }
+        
+        .form-section {
+            display: none;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #D6B588;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(246, 146, 30, 0.3);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #F6921E;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(214, 181, 136, 0.5);
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: #F6921E;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-submit:hover {
+            background: #e6821a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(246, 146, 30, 0.4);
+        }
+        
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: transparent;
+            color: #D6B588;
+            border: 1px solid rgba(246, 146, 30, 0.3);
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-back:hover {
+            border-color: #F6921E;
+            color: #F6921E;
+        }
+        
+        .error-message {
+            background: rgba(207, 46, 46, 0.2);
+            border: 1px solid rgba(207, 46, 46, 0.5);
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .success-message {
+            background: rgba(0, 208, 130, 0.2);
+            border: 1px solid rgba(0, 208, 130, 0.5);
+            color: #00d084;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                margin: 40px 20px;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>125 окрема важка механізована бригада</h1>
+            <p>Система входу та реєстрації</p>
+        </div>
+        
+        <div class="form-tabs">
+            <button class="form-tab active" data-tab="login">Вхід</button>
+            <button class="form-tab" data-tab="register">Реєстрація</button>
+        </div>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <!-- Login Form -->
+        <div id="loginForm" class="form-section active">
+            <form id="loginFormElement">
+                <div class="form-group">
+                    <label for="loginEmail">E-mail</label>
+                    <input type="email" id="loginEmail" name="email" required autocomplete="email" placeholder="Введіть ваш e-mail">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" name="password" required autocomplete="current-password" placeholder="Введіть ваш пароль">
+                </div>
+                <button type="submit" class="btn-submit">Увійти</button>
+            </form>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="registerForm" class="form-section">
+            <form id="registerFormElement">
+                <div class="form-group">
+                    <label for="registerFullName">Повне ім'я</label>
+                    <input type="text" id="registerFullName" name="fullName" required autocomplete="name" placeholder="Введіть ваше повне ім'я">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">E-mail</label>
+                    <input type="email" id="registerEmail" name="email" required autocomplete="email" placeholder="Введіть ваш e-mail">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" name="password" required autocomplete="new-password" placeholder="Введіть пароль">
+                </div>
+                <div class="form-group">
+                    <label for="registerPasswordConfirm">Підтвердження пароля</label>
+                    <input type="password" id="registerPasswordConfirm" name="passwordConfirm" required autocomplete="new-password" placeholder="Підтвердіть пароль">
+                </div>
+                <button type="submit" class="btn-submit">Зареєструватися</button>
+            </form>
+        </div>
+        
+        <a href="index.html" class="btn-back">← Повернутися на головну</a>
+    </div>
+    
+    <script src="app/scripts/login-init.js"></script>
+    <script src="https://unpkg.com/sql.js@1.8.0/dist/sql-wasm.js"></script>
+    <script src="app/scripts/database.js"></script>
+    <script src="app/scripts/localApi.js"></script>
+    <script src="app/scripts/api.js"></script>
+    <script src="app/scripts/login.js"></script>
+</body>
+</html>

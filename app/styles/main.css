@@ -1,0 +1,2043 @@
+/* Основні стилі для додатку - аналогічні до існуючих, але адаптовані */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Примусово виправляємо всі секції для вертикального розташування */
+#authScreen > section,
+#authScreen > footer {
+    float: none !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    clear: both !important;
+    display: block !important;
+}
+
+:root {
+    --primary: #e6a857;
+    --primary-dark: #d4a574;
+    --primary-light: #f5c97a;
+    --bg-dark: #1a1a1a;
+    --bg-darker: #0f0f0f;
+    --bg-card: rgba(20, 20, 20, 0.9);
+    --text-light: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.7);
+    --accent: #ffb84d;
+    --danger: #ff6b6b;
+    --border: rgba(230, 168, 87, 0.3);
+}
+
+/* Skeleton Loading Styles */
+.skeleton-loading {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.skeleton-card {
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(230, 168, 87, 0.1),
+        transparent
+    );
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.skeleton-card::after {
+    content: '';
+    display: block;
+    width: 60%;
+    height: 20px;
+    background: rgba(230, 168, 87, 0.2);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+html {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+body {
+    font-family: 'Mulish', 'UAF Sans', 'Arial', 'Helvetica', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-weight: 400;
+}
+
+.container {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* ========== AUTH SCREEN ========== */
+.auth-screen {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
+    box-sizing: border-box;
+    display: block !important;
+    font-family: 'Mulish', 'Arial', 'Helvetica', sans-serif;
+}
+
+/* Примусово виправляємо всі секції для вертикального розташування */
+#authScreen {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+    float: none !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+/* Всі прямі дочірні елементи authScreen мають бути блоками */
+#authScreen > header,
+#authScreen > section,
+#authScreen > footer {
+    display: block !important;
+    float: none !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    clear: both !important;
+    box-sizing: border-box !important;
+}
+
+/* Стилі для секцій у стилі ab3.army */
+#authScreen > section {
+    padding: 100px 0;
+    margin: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 1);
+}
+
+/* Hero секція */
+#authScreen > section.hero-section {
+    padding: 0;
+    margin: 30px 0 0;
+}
+
+/* Додатково для секцій */
+#authScreen > section.hero-section,
+#authScreen > section.about-section,
+#authScreen > section.paths-section,
+#authScreen > section.find-section,
+#authScreen > section.units-section,
+#authScreen > section.faq-section,
+#authScreen > section.join-section,
+#authScreen > section.join-form-section {
+    display: block !important;
+    float: none !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    clear: both !important;
+    box-sizing: border-box !important;
+}
+
+.homepage-header {
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+}
+
+.homepage-header .auth-screen-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 168, 87, 0.3);
+}
+
+/* Виправлення для секцій головної сторінки */
+.hero-section,
+.about-section,
+.paths-section,
+.find-section,
+.units-section,
+.faq-section,
+.join-section,
+.join-form-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    display: block !important;
+    position: relative !important;
+    clear: both !important;
+    float: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+.hero-content,
+.about-section > div,
+.paths-section > div,
+.find-section > div,
+.units-section > div,
+.faq-section > div,
+.join-section > div,
+.join-form-section > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+/* Забезпечуємо вертикальне розташування всіх секцій */
+.auth-screen > section {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    clear: both !important;
+    position: relative !important;
+    float: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.auth-screen > footer {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    clear: both !important;
+    position: relative !important;
+    float: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Медіа-запити для адаптивності */
+@media (max-width: 1200px) {
+    .about-section > div > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .find-section > div > div[style*="grid-template-columns: 1fr 1.5fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .faq-section > div > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .join-section > div > div[style*="grid-template-columns: repeat(5"] {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 32px !important;
+    }
+    
+    .hero-content p {
+        font-size: 18px !important;
+    }
+    
+    .paths-section > div > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .find-section > div > div > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.auth-screen-content {
+    text-align: center;
+    padding: 40px;
+    background: var(--bg-card);
+    border: 3px solid var(--primary);
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.heraldic-emblem-auth {
+    width: 120px;
+    height: 140px;
+    margin: 0 auto 30px;
+}
+
+.auth-screen-title {
+    color: var(--primary);
+    font-size: 32px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+.auth-screen-subtitle {
+    color: var(--text-muted);
+    font-size: 16px;
+    margin-bottom: 40px;
+}
+
+.auth-screen-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.auth-screen-btn {
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid var(--primary);
+}
+
+.auth-screen-btn.primary {
+    background: var(--primary);
+    color: #000;
+}
+
+.auth-screen-btn.primary:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+}
+
+.auth-screen-btn.secondary {
+    background: transparent;
+    color: var(--primary);
+}
+
+.auth-screen-btn.secondary:hover {
+    background: rgba(230, 168, 87, 0.1);
+}
+
+/* ========== HEADER ========== */
+.app-header {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(10, 10, 10, 0.98) 100%);
+    padding: 20px;
+    border-bottom: 4px solid var(--primary);
+    margin-bottom: 30px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    width: 60px;
+    height: 70px;
+    object-fit: contain;
+}
+
+.header-text h1 {
+    color: var(--primary);
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.header-subtitle {
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 18px;
+    background: rgba(230, 168, 87, 0.15);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-name {
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.user-role {
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.header-btn {
+    padding: 8px 16px;
+    background: rgba(230, 168, 87, 0.2);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.header-btn:hover {
+    background: rgba(230, 168, 87, 0.4);
+    transform: translateY(-2px);
+}
+
+/* ========== NAVIGATION ========== */
+.nav-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 12px;
+}
+
+.nav-tab {
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(230, 168, 87, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-tab:hover::before {
+    left: 100%;
+}
+
+.nav-tab:hover {
+    background: rgba(230, 168, 87, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 168, 87, 0.3);
+}
+
+.nav-tab.active {
+    background: var(--primary);
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 168, 87, 0.5);
+    animation: tabActivate 0.3s ease;
+}
+
+@keyframes tabActivate {
+    0% {
+        transform: scale(0.95);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1) translateY(-2px);
+    }
+}
+
+/* ========== SECTIONS ========== */
+.section {
+    display: none;
+    padding: 20px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.section.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.section-header h2 {
+    color: var(--primary);
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ========== BUTTONS ========== */
+.btn-primary,
+.btn-secondary {
+    padding: 12px 24px;
+    border: 2px solid var(--primary);
+    background: var(--primary);
+    color: #000;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+}
+
+.btn-primary:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--primary);
+}
+
+.btn-secondary:hover {
+    background: rgba(230, 168, 87, 0.1);
+}
+
+/* ========== VIEW TOGGLE ========== */
+.view-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.toggle-btn {
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn.active {
+    background: var(--primary);
+    color: #000;
+}
+
+/* ========== LISTS ========== */
+.knowledge-list,
+.courses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.knowledge-list.grid-view,
+.courses-list.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.knowledge-item,
+.course-item {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 15px;
+}
+
+.knowledge-item:hover,
+.course-item:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.knowledge-card,
+.course-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.knowledge-card:hover,
+.course-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.material-icon {
+    font-size: 32px;
+}
+
+.material-info {
+    flex: 1;
+}
+
+.material-info h3 {
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.material-info p {
+    color: var(--text-muted);
+}
+
+/* ========== DASHBOARD ========== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.dashboard-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.dashboard-card h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+/* ========== PROFILE ========== */
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.profile-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.profile-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.profile-card h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 18px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(230, 168, 87, 0.1);
+}
+
+.info-label {
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.info-value {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.courses-list, .test-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.course-item, .test-result-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+/* Стилі для пройдених курсів - зелений відтінок */
+.course-item.completed {
+    background: rgba(40, 167, 69, 0.15);
+    border-color: #28a745;
+    border-left: 4px solid #28a745;
+}
+
+.course-item.completed .course-info h4 {
+    color: #28a745;
+}
+
+.course-item.completed:hover {
+    background: rgba(40, 167, 69, 0.25);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Стилі для курсів в процесі - помаранчевий/жовтий відтінок */
+.course-item.in-progress {
+    background: rgba(255, 193, 7, 0.15);
+    border-color: #ffc107;
+    border-left: 4px solid #ffc107;
+}
+
+.course-item.in-progress .course-info h4 {
+    color: #ffc107;
+}
+
+.course-item.in-progress .progress-fill {
+    background: linear-gradient(90deg, #ffc107, #ff9800);
+}
+
+.course-item.in-progress:hover {
+    background: rgba(255, 193, 7, 0.25);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+/* Стилі для доступних курсів - сірий/нейтральний відтінок */
+.course-item.available {
+    background: rgba(108, 117, 125, 0.15);
+    border-color: #6c757d;
+    border-left: 4px solid #6c757d;
+}
+
+.course-item.available .course-info h4 {
+    color: var(--text-light);
+}
+
+.course-item.available:hover {
+    background: rgba(108, 117, 125, 0.25);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    border-color: var(--primary);
+}
+
+.course-info h4 {
+    color: var(--primary);
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+
+.course-date, .test-date {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.test-result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.test-result-item.passed {
+    border-color: #28a745;
+}
+
+.test-result-item.failed {
+    border-color: #dc3545;
+}
+
+.test-status {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.test-status.passed {
+    background: rgba(40, 167, 69, 0.2);
+    color: #4ade80;
+}
+
+.test-status.failed {
+    background: rgba(220, 53, 69, 0.2);
+    color: #ff6b7a;
+}
+
+.learning-history {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-item {
+    display: flex;
+    gap: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.history-action {
+    color: var(--primary);
+    font-weight: bold;
+    min-width: 100px;
+}
+
+.history-entity {
+    color: var(--text-light);
+    flex: 1;
+}
+
+.history-date {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+/* ========== MODAL ========== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border: 3px solid var(--primary);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.modal-title {
+    color: var(--primary);
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.close-btn:hover {
+    color: var(--primary-light);
+}
+
+/* ========== FORMS ========== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--primary);
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(20, 20, 20, 0.9);
+    color: var(--text-light);
+    border: 2px solid var(--primary);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 10px rgba(230, 168, 87, 0.3);
+}
+
+.form-group small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* ========== NOTIFICATION ========== */
+.notification {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-card);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    padding: 15px 20px;
+    color: var(--text-light);
+    z-index: 10001;
+    max-width: 400px;
+}
+
+.notification.success {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.notification.error {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.notification.info {
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+/* ========== UTILITY ========== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.error {
+    color: var(--danger);
+}
+
+/* Зменшення подразливих анімацій */
+* {
+    transition-duration: 0.2s !important;
+}
+
+/* Прибрати зайві анімації */
+@keyframes none {
+    from { opacity: 1; }
+    to { opacity: 1; }
+}
+
+/* Плавні переходи без різких рухів */
+.section {
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+}
+
+.modal-overlay {
+    transition: opacity 0.2s ease !important;
+}
+
+/* Мінімізація hover ефектів */
+button:hover, .nav-tab:hover, .personnel-card:hover, .knowledge-material-card:hover {
+    transform: translateY(-1px) !important;
+}
+
+/* ========== COURSES ENHANCED ========== */
+.course-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.course-card-header h3 {
+    color: var(--primary);
+    margin: 0;
+    flex: 1;
+}
+
+.course-status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.course-status-badge.status-assigned {
+    background: rgba(108, 117, 125, 0.3);
+    color: #6c757d;
+}
+
+.course-status-badge.status-in-progress {
+    background: rgba(23, 162, 184, 0.3);
+    color: #17a2b8;
+}
+
+.course-status-badge.status-completed {
+    background: rgba(40, 167, 69, 0.3);
+    color: #28a745;
+}
+
+.course-status-badge.status-failed {
+    background: rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+}
+
+.course-status-badge.status-locked {
+    background: rgba(108, 117, 125, 0.3);
+    color: #6c757d;
+}
+
+.course-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.course-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.course-stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.course-progress {
+    margin-top: 10px;
+}
+
+.course-progress .progress-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 5px;
+    display: block;
+}
+
+.course-locked-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.course-card.locked {
+    position: relative;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.course-item.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.course-item-icon {
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+.course-item-info {
+    flex: 1;
+}
+
+.course-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.course-item-header h3 {
+    color: var(--primary);
+    margin: 0;
+    flex: 1;
+}
+
+.course-item-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.course-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.course-locked-icon {
+    font-size: 24px;
+    color: var(--text-muted);
+}
+
+/* ========== COURSE VIEW MODAL ========== */
+.course-view-modal {
+    max-width: 900px;
+}
+
+.course-view-description {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.course-modules-section {
+    margin-top: 20px;
+}
+
+.course-modules-section h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.course-modules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.course-module-item {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.course-module-item:hover:not(.locked) {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.course-module-item.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.module-header h4 {
+    color: var(--primary);
+    margin: 0;
+    flex: 1;
+}
+
+.module-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.module-lessons-count {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.module-progress {
+    flex: 1;
+    max-width: 200px;
+}
+
+.module-locked {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* ========== MODULE VIEW MODAL ========== */
+.module-view-modal {
+    max-width: 800px;
+}
+
+.module-lessons-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lesson-item {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 15px;
+}
+
+.lesson-item:hover:not(.locked) {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.lesson-item.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.lesson-item.completed {
+    border-color: rgba(40, 167, 69, 0.5);
+}
+
+.lesson-icon {
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+.lesson-info {
+    flex: 1;
+}
+
+.lesson-info h4 {
+    color: var(--primary);
+    margin: 0 0 8px 0;
+}
+
+.lesson-description {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.lesson-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+.lesson-type {
+    padding: 2px 8px;
+    background: rgba(230, 168, 87, 0.2);
+    border-radius: 4px;
+}
+
+.lesson-completed {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.lesson-time-remaining {
+    color: var(--accent);
+}
+
+.lesson-locked {
+    font-size: 24px;
+    color: var(--text-muted);
+}
+
+/* ========== LESSON VIEW MODAL ========== */
+.lesson-view-modal {
+    max-width: 1000px;
+}
+
+.lesson-content {
+    margin: 20px 0;
+    min-height: 300px;
+}
+
+.lesson-text-content {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    line-height: 1.8;
+}
+
+.lesson-video-content {
+    position: relative;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.lesson-video-content video {
+    display: block;
+    width: 100%;
+    max-height: 60vh;
+}
+
+.video-loading {
+    color: var(--text-muted);
+    padding: 40px;
+}
+
+.video-error {
+    color: var(--danger);
+    padding: 40px;
+}
+
+.lesson-pdf-content {
+    background: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 60vh;
+}
+
+.lesson-pdf-content iframe {
+    width: 100%;
+    height: 60vh;
+    border: none;
+}
+
+.lesson-timer {
+    margin: 20px 0;
+    padding: 15px;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+.timer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.time-remaining {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.lesson-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.lesson-complete-hint {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.lesson-completed-message {
+    padding: 15px;
+    background: rgba(40, 167, 69, 0.2);
+    border: 2px solid rgba(40, 167, 69, 0.5);
+    border-radius: 8px;
+    text-align: center;
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+    }
+
+    .nav-tabs {
+        flex-direction: column;
+    }
+
+    .nav-tab {
+        width: 100%;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .knowledge-list.grid-view,
+    .courses-list.grid-view {
+        grid-template-columns: 1fr;
+    }
+    
+    .course-item-header,
+    .module-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .timer-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ========== EQUIPMENT (ЗАСОБИ) - стилі зі старого проєкту ========== */
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 25px;
+}
+
+.equipment-card {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(26, 26, 46, 0.85) 100%);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    animation: cardSlideIn 0.5s ease backwards;
+    cursor: pointer;
+}
+
+.equipment-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(230, 168, 87, 0.4);
+    border-color: var(--primary-light);
+}
+
+.equipment-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 2px solid rgba(230, 168, 87, 0.3);
+    background: rgba(230, 168, 87, 0.05);
+}
+
+.equipment-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.equipment-type {
+    font-size: 12px;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.equipment-manufacturer {
+    font-size: 13px;
+    color: var(--text-light);
+    opacity: 0.8;
+    margin-bottom: 10px;
+}
+
+.file-upload-area {
+    border: 2px dashed var(--primary);
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(230, 168, 87, 0.05);
+}
+
+.file-upload-area:hover {
+    border-color: var(--primary-light);
+    background: rgba(230, 168, 87, 0.1);
+}
+
+.file-upload-area.dragover {
+    border-color: var(--accent);
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 2px solid var(--primary);
+}
+
+/* ========== CREWS (ЕКІПАЖІ) - стилі зі старого проєкту ========== */
+.crew-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 25px;
+}
+
+.crew-card {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(26, 26, 46, 0.85) 100%);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    animation: cardSlideIn 0.5s ease backwards;
+}
+
+.crew-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(230, 168, 87, 0.4);
+    border-color: var(--primary-light);
+}
+
+.crew-card-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.crew-card-uav {
+    font-size: 14px;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+.crew-card-members {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.crew-member-item {
+    padding: 8px 12px;
+    background: rgba(230, 168, 87, 0.1);
+    border: 1px solid rgba(230, 168, 87, 0.3);
+    border-radius: 6px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.crew-member-item:hover {
+    background: rgba(230, 168, 87, 0.2);
+    border-color: var(--primary);
+}
+
+.crew-member-name {
+    color: var(--primary);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s ease;
+}
+
+.crew-member-name:hover {
+    text-decoration-color: var(--primary);
+    color: var(--primary-light);
+}
+
+.search-dropdown {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(26, 26, 46, 0.8);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.dropdown-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid var(--primary);
+    border-radius: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 100;
+    margin-top: 5px;
+    display: none;
+}
+
+.dropdown-results.active { 
+    display: block; 
+}
+
+.dropdown-item {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(230, 168, 87, 0.2);
+    transition: all 0.2s;
+    color: var(--text-light);
+}
+
+.dropdown-item:hover {
+    background: rgba(230, 168, 87, 0.1);
+    color: var(--primary);
+}
+
+.dropdown-item:last-child { 
+    border-bottom: none; 
+}
+
+@keyframes cardSlideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ========== EQUIPMENT (ЗАСОБИ) ========== */
+.equipment-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.equipment-container {
+    width: 100%;
+}
+
+.equipment-container.grid-view .equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.equipment-container.list-view .equipment-list {
+    width: 100%;
+}
+
+.equipment-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    justify-content: space-between;
+    min-height: 220px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.equipment-card h3 {
+    color: var(--primary);
+    font-size: 18px;
+    margin: 0 0 6px 0;
+    text-align: center;
+}
+
+.equipment-photo,
+.equipment-photo-placeholder {
+    width: 100%;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.equipment-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.equipment-photo-placeholder {
+    font-size: 32px;
+    color: var(--text-muted);
+}
+
+.equipment-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.equipment-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.equipment-table th,
+.equipment-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(230, 168, 87, 0.2);
+    text-align: left;
+    font-size: 14px;
+}
+
+.equipment-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.equipment-thumbnail-placeholder {
+    display: inline-flex;
+    width: 50px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Стилі для меню (menu-wrapper) */
+.menu-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.menu-wrapper.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.menu-wrapper .container {
+    padding: 8rem 2rem 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.menu-wrapper .header-menu {
+    margin-top: 4rem;
+}
+
+.menu-wrapper .header-menu .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.menu-wrapper .header-menu .menu .menu-item {
+    margin: 0;
+}
+
+.menu-wrapper .header-menu .menu .menu-item a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 2rem;
+    font-weight: 600;
+    display: block;
+    padding: 1rem 0;
+    transition: color 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.menu-wrapper .header-menu .menu .menu-item a:hover,
+.menu-wrapper .header-menu .menu .menu-item a:focus {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.menu-wrapper .header-menu .menu .menu-item.current-menu-item a {
+    color: var(--primary);
+}
+
+.menu-wrapper .menu-auth-buttons {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.menu-wrapper .menu-auth-buttons .btn {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+#toggleMenu {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+    transition: color 0.3s ease;
+}
+
+#toggleMenu:hover {
+    color: var(--primary);
+}
+
+#toggleMenu .icon-open,
+#toggleMenu .icon-close {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#toggleMenu .icon-close {
+    display: none;
+}
+
+.menu-wrapper.is-open ~ header #toggleMenu .icon-open {
+    display: none;
+}
+
+.menu-wrapper.is-open ~ header #toggleMenu .icon-close {
+    display: flex;
+}
+
+@media (min-width: 768px) {
+    .menu-wrapper .header-menu .menu .menu-item a {
+        font-size: 2.4rem;
+    }
+    
+    .menu-wrapper .menu-auth-buttons {
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .menu-wrapper .menu-auth-buttons .btn {
+        width: auto;
+        flex: 1;
+    }
+}
+
+/* Contact form button styles */
+#contactFormModal .btn,
+.contact-form .btn {
+    background-color: rgba(225, 103, 9, 1);
+}
+
+/* Modal backdrop color */
+.modal-backdrop {
+    color: rgba(255, 255, 255, 1);
+}
