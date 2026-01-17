@@ -267,6 +267,12 @@ async function loadProfile() {
         // Відображення результатів тестів
         const testResults = user.test_results || [];
 
+        // Перевіряємо чи є дані користувача
+        if (!user) {
+            content.innerHTML = `<p class="error">Помилка: Дані користувача не отримано</p>`;
+            return;
+        }
+        
         content.innerHTML = `
             <div class="profile-grid">
                 <div class="profile-card">
@@ -274,11 +280,11 @@ async function loadProfile() {
                     <div class="profile-info">
                         <div class="info-row">
                             <span class="info-label">ПІБ:</span>
-                            <span class="info-value">${user.full_name}</span>
+                            <span class="info-value">${user.full_name || 'Не вказано'}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Email:</span>
-                            <span class="info-value">${user.email}</span>
+                            <span class="info-value">${user.email || 'Не вказано'}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Роль:</span>
@@ -287,11 +293,11 @@ async function loadProfile() {
                         ${user.personnel ? `
                             <div class="info-row">
                                 <span class="info-label">Посада:</span>
-                                <span class="info-value">${user.personnel.position}</span>
+                                <span class="info-value">${user.personnel.position || 'Не вказано'}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Звання:</span>
-                                <span class="info-value">${user.personnel.rank}</span>
+                                <span class="info-value">${user.personnel.rank || 'Не вказано'}</span>
                             </div>
                         ` : ''}
                     </div>
@@ -410,7 +416,14 @@ async function loadProfile() {
             </div>
         `;
     } catch (error) {
-        content.innerHTML = `<p class="error">Помилка завантаження: ${error.message}</p>`;
+        console.error('Profile loading error:', error);
+        const errorMessage = error.message || 'Невідома помилка';
+        content.innerHTML = `
+            <div class="error-container">
+                <p class="error">Помилка завантаження профілю: ${errorMessage}</p>
+                <button class="btn-primary" onclick="loadProfile()">Спробувати ще раз</button>
+            </div>
+        `;
     }
 }
 
