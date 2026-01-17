@@ -479,15 +479,6 @@
         // Ініціалізація при завантаженні
         window.addEventListener('load', async () => {
             try {
-                // Перевіряємо чи є токен авторизації
-                const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
-                
-                // Якщо немає токену, перенаправляємо на login.html
-                if (!token) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-
                 const useLocalDb = typeof window !== 'undefined' && window.USE_LOCAL_DB === true;
 
                 // Для локальної версії (SQL.js) спочатку ініціалізуємо БД.
@@ -502,11 +493,27 @@
                     }
                 }
 
-                // Перевіряємо автентифікацію - якщо токен валідний, показуємо контент
+                // Перевіряємо автентифікацію - checkAuth() сам перевірить токен і покаже/приховає контент
                 if (typeof checkAuth === 'function') {
                     await checkAuth();
+                    // Після checkAuth() перевіряємо чи показано mainContent
+                    // Якщо токену немає і mainContent не показано, перенаправляємо на login.html
+                    const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+                    const mainContent = document.getElementById('mainContent');
+                    if (!token && (!mainContent || mainContent.style.display === 'none')) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
                 } else {
                     // Якщо checkAuth не знайдено, перевіряємо токен напряму
+                    const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+                    
+                    if (!token) {
+                        // Якщо немає токену, перенаправляємо на login.html
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    
                     try {
                         const response = await api.getCurrentUser();
                         const data = await api.handleResponse(response);
@@ -537,13 +544,19 @@
                             error.message.includes('Unauthorized')
                         )) {
                             window.location.href = 'login.html';
+                        } else {
+                            // Для інших помилок також перенаправляємо
+                            window.location.href = 'login.html';
                         }
                     }
                 }
             } catch (error) {
                 console.error('Initialization error:', error);
-                // При помилці ініціалізації також перенаправляємо на login.html
-                window.location.href = 'login.html';
+                // При помилці ініціалізації перевіряємо чи є токен
+                const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+                if (!token) {
+                    window.location.href = 'login.html';
+                }
             }
         });
     </script>

@@ -106,9 +106,9 @@
 	</ul>
 </div>
 </div><div class="languages-widget-block"></div>                </div>
-                <button id="toggleMenu" onclick="toggleMenu()">
+                <button id="toggleMenu" onclick="if(typeof showLoginModal === 'function') { showLoginModal(); } else { window.location.href = 'login.html'; }">
                     <span class="icon-open">
-                        <img src="app/assets/images/burger.svg" alt="Бургер Меню"><span class="d-none d-md-block">Меню</span>
+                        <img src="app/assets/images/burger.svg" alt="Бургер Меню"><span class="d-none d-md-block">Вхід</span>
                     </span>
                     <img class="icon-close" src="app/assets/images/close-icon-sm.svg" alt="Іконка Закрити">
                 </button>
