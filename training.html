@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.quilljs.com https://analytics.tiktok.com https://static.hotjar.com https://connect.facebook.net https://widgets.binotel.com https://www.clarity.ms https://ab3.army https://www.googleadservices.com https://googleads.g.doubleclick.net; script-src-elem 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.quilljs.com https://analytics.tiktok.com https://static.hotjar.com https://connect.facebook.net https://widgets.binotel.com https://www.clarity.ms https://ab3.army https://www.googleadservices.com https://googleads.g.doubleclick.net; script-src-attr 'unsafe-hashes'; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com; connect-src 'self' http://localhost:* http://127.0.0.1:* https://*.up.railway.app https://unpkg.com https://analytics.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net; img-src 'self' data: blob: https://ab3.army https://www.google.com.ua https://www.googleadservices.com; font-src 'self' data:; worker-src 'self' blob: https://unpkg.com;">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.quilljs.com https://analytics.tiktok.com https://static.hotjar.com https://connect.facebook.net https://widgets.binotel.com https://www.clarity.ms https://ab3.army https://www.googleadservices.com https://googleads.g.doubleclick.net; script-src-elem 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://cdn.quilljs.com https://analytics.tiktok.com https://static.hotjar.com https://connect.facebook.net https://widgets.binotel.com https://www.clarity.ms https://ab3.army https://www.googleadservices.com https://googleads.g.doubleclick.net; script-src-attr 'unsafe-hashes'; style-src 'self' 'unsafe-inline' https://cdn.quilljs.com; connect-src 'self' http://localhost:* http://127.0.0.1:* https://*.up.railway.app https://unpkg.com https://analytics.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://ab3.army; img-src 'self' data: blob: https://ab3.army https://www.google.com.ua https://www.googleadservices.com; font-src 'self' data:; worker-src 'self' blob: https://unpkg.com;">
     <title>125 окрема важка механізована бригада — ЗСУ</title>
     <!-- Шрифти з ab3.army -->
     <link rel="stylesheet" href="app/styles/fonts.css">
@@ -993,7 +993,8 @@ var foreignersFormData = {"ajaxUrl":"https://ab3.army/wp-admin/admin-ajax.php","
 //# sourceURL=theme-scripts-js-extra
 /* ]]> */
 </script>
-<script type="text/javascript" src="app/scripts/index.js" id="theme-scripts-js"></script>
+<!-- Removed index.js reference - file does not exist -->
+<!-- <script type="text/javascript" src="app/scripts/index.js" id="theme-scripts-js"></script> -->
 <script id="wp-emoji-settings" type="application/json">
 {"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"https://ab3.army/wp-includes/js/wp-emoji-release.min.js?ver=6.9"}}
 </script>
@@ -1016,10 +1017,10 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
             <h1 class="auth-screen-title">Training Recording System</h1>
             <div class="auth-screen-subtitle">База знань та облік навченості</div>
             <div class="auth-screen-buttons">
-                <button class="auth-screen-btn primary" onclick="if(typeof showLoginModal === 'function') showLoginModal(); else console.error('showLoginModal not found');">
+                <button class="auth-screen-btn primary" id="authLoginBtn" onclick="event.preventDefault(); if(typeof showLoginModal === 'function') { showLoginModal(); } else { console.error('showLoginModal not found. Waiting for scripts to load...'); setTimeout(function() { if(typeof showLoginModal === 'function') showLoginModal(); else alert('Помилка: функція входу не завантажена. Перезавантажте сторінку.'); }, 500); }">
                     🔐 Увійти
                 </button>
-                <button class="auth-screen-btn secondary" onclick="if(typeof showRegisterModal === 'function') showRegisterModal(); else console.error('showRegisterModal not found');">
+                <button class="auth-screen-btn secondary" id="authRegisterBtn" onclick="event.preventDefault(); if(typeof showRegisterModal === 'function') { showRegisterModal(); } else { console.error('showRegisterModal not found. Waiting for scripts to load...'); setTimeout(function() { if(typeof showRegisterModal === 'function') showRegisterModal(); else alert('Помилка: функція реєстрації не завантажена. Перезавантажте сторінку.'); }, 500); }">
                     📝 Реєстрація
                 </button>
             </div>
