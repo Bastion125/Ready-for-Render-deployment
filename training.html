@@ -60,28 +60,34 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(230, 168, 87, 0.3);
         }
+        /* Логотип як фон (чорно-білий, прозорий) */
+        body {
+            background-image: url('app/assets/logo.png');
+            background-size: 30%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            filter: grayscale(100%) opacity(0.05);
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('app/assets/logo.png');
+            background-size: 30%;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: grayscale(100%) opacity(0.05);
+            z-index: -1;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
-    <!-- Екран автентифікації -->
-    <div id="authScreen" class="auth-screen">
-        <div class="auth-screen-content">
-            <div class="heraldic-emblem-auth">
-                <img src="app/assets/logo.png" alt="Логотип" style="width: 100%; height: 100%; object-fit: contain;">
-            </div>
-            <h1 class="auth-screen-title">Training Recording System</h1>
-            <div class="auth-screen-subtitle">База знань та облік навченості</div>
-            <div class="auth-screen-buttons">
-                <button class="auth-screen-btn primary" onclick="showLoginModal()">
-                    🔐 Увійти
-                </button>
-                <button class="auth-screen-btn secondary" onclick="showRegisterModal()">
-                    📝 Реєстрація
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Основний контент -->
     <div id="mainContent" class="container" style="display: none;">
         <!-- Header -->
@@ -419,68 +425,6 @@
 
     </div>
 
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal-overlay" data-modal="loginModal">
-        <div class="modal-content auth-modal">
-            <div class="modal-header">
-                <div class="modal-title">Вхід в систему</div>
-                <button class="close-btn" data-close="loginModal">✕</button>
-            </div>
-            <div class="modal-body">
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label>E-mail</label>
-                        <input type="email" id="loginEmail" required autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label>Пароль</label>
-                        <input type="password" id="loginPassword" required autocomplete="current-password">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Увійти</button>
-                        <button type="button" class="btn-secondary" data-close="loginModal">Скасувати</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div id="registerModal" class="modal-overlay" data-modal="registerModal">
-        <div class="modal-content auth-modal">
-            <div class="modal-header">
-                <div class="modal-title">Реєстрація</div>
-                <button class="close-btn" data-close="registerModal">✕</button>
-            </div>
-            <div class="modal-body">
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label>ПІБ (Повне ім'я)</label>
-                        <input type="text" id="registerFullName" required autocomplete="name">
-                    </div>
-                    <div class="form-group">
-                        <label>E-mail</label>
-                        <input type="email" id="registerEmail" required autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label>Пароль</label>
-                        <input type="password" id="registerPassword" required autocomplete="new-password" minlength="8">
-                        <small>Мінімум 8 символів</small>
-                    </div>
-                    <div class="form-group">
-                        <label>Підтвердження пароля</label>
-                        <input type="password" id="registerPasswordConfirm" required autocomplete="new-password">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Зареєструватися</button>
-                        <button type="button" class="btn-secondary" data-close="registerModal">Скасувати</button>
-                        <button type="button" class="btn-link" data-close="registerModal" data-href="../public/index.html">← На головну</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Модальні вікна -->
     <!-- Модальне вікно картки військовослужбовця -->
     <div id="personnelModal" class="modal-overlay" data-modal="personnelModal">
@@ -532,90 +476,16 @@
     <script src="app/scripts/equipment.js"></script>
     <script src="app/scripts/courses.js"></script>
     <script>
-        // Ініціалізація кнопок авторизації та модальних вікон після завантаження скриптів
-        document.addEventListener('DOMContentLoaded', function() {
-            // Додаємо event listeners для кнопок авторизації
-            setTimeout(function() {
-                const loginBtn = document.querySelector('#authScreenTS .auth-screen-btn.primary');
-                const registerBtn = document.querySelector('#authScreenTS .auth-screen-btn.secondary');
-                
-                if (loginBtn && typeof showLoginModal === 'function') {
-                    loginBtn.addEventListener('click', function() {
-                        showLoginModal();
-                    });
-                }
-                
-                if (registerBtn && typeof showRegisterModal === 'function') {
-                    registerBtn.addEventListener('click', function() {
-                        showRegisterModal();
-                    });
-                }
-                
-                // Обробка модальних вікон через data-атрибути
-                document.querySelectorAll('[data-modal]').forEach(function(modal) {
-                    modal.addEventListener('click', function(e) {
-                        if (e.target === modal) {
-                            const modalId = modal.getAttribute('data-modal');
-                            if (typeof closeModal === 'function') {
-                                closeModal(modalId);
-                            }
-                        }
-                    });
-                });
-                
-                // Зупинка propagation для modal-content
-                document.querySelectorAll('.modal-content').forEach(function(content) {
-                    content.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                    });
-                });
-                
-                // Обробка кнопок закриття
-                document.querySelectorAll('[data-close]').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        const modalId = btn.getAttribute('data-close');
-                        if (typeof closeModal === 'function') {
-                            closeModal(modalId);
-                        }
-                        // Якщо є data-href, перенаправляємо
-                        const href = btn.getAttribute('data-href');
-                        if (href) {
-                            window.location.href = href;
-                        }
-                    });
-                });
-                
-                // Обробка форм
-                const loginForm = document.getElementById('loginForm');
-                if (loginForm && typeof handleLogin === 'function') {
-                    loginForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        handleLogin(e);
-                        return false;
-                    });
-                }
-                
-                const registerForm = document.getElementById('registerForm');
-                if (registerForm && typeof handleRegister === 'function') {
-                    registerForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        handleRegister(e);
-                        return false;
-                    });
-                }
-            }, 100);
-        });
-        
         // Ініціалізація при завантаженні
         window.addEventListener('load', async () => {
             try {
-                // Спочатку перевіряємо чи є токен, щоб не показувати authScreenTS зайво
+                // Перевіряємо чи є токен авторизації
                 const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
-                const authScreenTS = document.getElementById('authScreenTS');
                 
-                // Якщо є токен, одразу приховуємо authScreenTS (він не повинен показуватися для залогінених)
-                if (token && authScreenTS) {
-                    authScreenTS.style.display = 'none';
+                // Якщо немає токену, перенаправляємо на login.html
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
                 }
 
                 const useLocalDb = typeof window !== 'undefined' && window.USE_LOCAL_DB === true;
@@ -632,17 +502,48 @@
                     }
                 }
 
-                // Перевіряємо автентифікацію (якщо токен є, checkAuth покаже mainContent, якщо ні - покаже authScreenTS)
+                // Перевіряємо автентифікацію - якщо токен валідний, показуємо контент
                 if (typeof checkAuth === 'function') {
                     await checkAuth();
                 } else {
-                    console.warn('checkAuth function not found');
+                    // Якщо checkAuth не знайдено, перевіряємо токен напряму
+                    try {
+                        const response = await api.getCurrentUser();
+                        const data = await api.handleResponse(response);
+                        if (data.success) {
+                            // Показуємо основний контент
+                            const mainContent = document.getElementById('mainContent');
+                            if (mainContent) {
+                                mainContent.style.display = 'block';
+                            }
+                            // Оновлюємо інформацію про користувача
+                            if (typeof updateUserInfo === 'function') {
+                                updateUserInfo();
+                            }
+                            if (typeof checkUserRole === 'function') {
+                                checkUserRole();
+                            }
+                        } else {
+                            // Токен недійсний, перенаправляємо на login.html
+                            window.location.href = 'login.html';
+                        }
+                    } catch (error) {
+                        console.error('Auth check error:', error);
+                        // Якщо помилка авторизації, перенаправляємо на login.html
+                        if (error.message && (
+                            error.message.includes('Сесія недійсна') || 
+                            error.message.includes('Токен не знайдено') ||
+                            error.message.includes('401') ||
+                            error.message.includes('Unauthorized')
+                        )) {
+                            window.location.href = 'login.html';
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Initialization error:', error);
-                if (typeof showNotification === 'function') {
-                    showNotification('Помилка ініціалізації: ' + error.message, 'error');
-                }
+                // При помилці ініціалізації також перенаправляємо на login.html
+                window.location.href = 'login.html';
             }
         });
     </script>
