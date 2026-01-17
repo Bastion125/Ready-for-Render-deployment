@@ -28,6 +28,7 @@ const getCorsOrigins = () => {
   
   const defaultOrigins = [
     'https://bastion125.github.io',
+    'https://bastion125.github.io/',
     'http://localhost:3000',
     'http://localhost:8080',
     'http://localhost',
@@ -38,41 +39,84 @@ const getCorsOrigins = () => {
   
   if (process.env.CORS_ORIGIN) {
     const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim()).filter(Boolean);
-    return [...envOrigins, ...defaultOrigins];
+    return [...new Set([...envOrigins, ...defaultOrigins])]; // Видаляємо дублікати
   }
   
   return defaultOrigins;
 };
 
-// Спрощена CORS конфігурація
-app.use(cors({
-  origin: getCorsOrigins(),
+// Функція для перевірки чи origin дозволений
+const isOriginAllowed = (origin, allowedOrigins) => {
+  if (!origin) return false;
+  if (allowedOrigins === true) return true;
+  if (!Array.isArray(allowedOrigins)) return false;
+  
+  // Перевіряємо точне співпадіння або з слешем в кінці
+  return allowedOrigins.some(allowed => {
+    if (allowed === origin) return true;
+    // Дозволяємо як з слешем так і без
+    if (allowed.endsWith('/') && origin === allowed.slice(0, -1)) return true;
+    if (origin.endsWith('/') && allowed === origin.slice(0, -1)) return true;
+    return false;
+  });
+};
+
+// CORS конфігурація з покращеною обробкою
+const corsOptions = {
+  origin: (origin, callback) => {
+    const allowedOrigins = getCorsOrigins();
+    
+    // Дозволяємо запити без origin (наприклад, Postman, curl)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    if (isOriginAllowed(origin, allowedOrigins)) {
+      callback(null, true);
+    } else {
+      logger.warn(`CORS: Blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  credentials: true
-}));
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400, // 24 години
+  preflightContinue: false,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 // Явна обробка OPTIONS запитів для CORS preflight (критично для GitHub Pages)
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
-// Додаткова явна обробка preflight запитів
+// Додаткова явна обробка preflight запитів (backup)
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     const origin = req.headers.origin;
     const allowedOrigins = getCorsOrigins();
     
     // Перевіряємо чи origin дозволений
-    if (allowedOrigins === true || (Array.isArray(allowedOrigins) && allowedOrigins.includes(origin))) {
+    if (!origin || isOriginAllowed(origin, allowedOrigins)) {
       res.header('Access-Control-Allow-Origin', origin || '*');
       res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS,PATCH');
       res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept,Origin');
       res.header('Access-Control-Allow-Credentials', 'true');
       res.header('Access-Control-Max-Age', '86400');
       return res.sendStatus(200);
+    } else {
+      logger.warn(`CORS preflight: Blocked origin: ${origin}`);
+      return res.status(403).json({ error: 'CORS policy violation' });
     }
   }
   next();
 });
+
+// Trust proxy - важливо для express-rate-limit на Render/Heroku
+// Render використовує проксі, тому потрібно довіряти X-Forwarded-* заголовкам
+app.set('trust proxy', 1);
 
 // Security middleware - після CORS
 app.use(helmet({
