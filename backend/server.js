@@ -265,8 +265,7 @@ async function ensureAdminExists() {
           email: adminEmail,
           passwordHash: adminPasswordHash,
           roleId: systemAdminRole.id,
-          isActive: true,
-          full_name: 'System Administrator'
+          isActive: true
         }
       });
       
