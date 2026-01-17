@@ -498,9 +498,9 @@
                     await checkAuth();
                     // Після checkAuth() перевіряємо чи показано mainContent
                     // Якщо токену немає і mainContent не показано, перенаправляємо на login.html
-                    const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+                    const tokenAfterCheck = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
                     const mainContent = document.getElementById('mainContent');
-                    if (!token && (!mainContent || mainContent.style.display === 'none')) {
+                    if (!tokenAfterCheck && (!mainContent || mainContent.style.display === 'none')) {
                         window.location.href = 'login.html';
                         return;
                     }
