@@ -73,7 +73,19 @@ async function handleLogin(event) {
                 window.location.href = redirectUrl;
             }, 1000);
         } else {
-            showError(data.message || 'Помилка входу. Перевірте дані та спробуйте ще раз.');
+            // Показуємо помилки валідації якщо вони є
+            let errorMsg = data.message || 'Помилка входу. Перевірте дані та спробуйте ще раз.';
+            if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+                const validationErrors = data.errors.map(err => {
+                    const field = err.param || err.field || '';
+                    const msg = err.msg || err.message || '';
+                    return field ? `${field}: ${msg}` : msg;
+                }).filter(msg => msg);
+                if (validationErrors.length > 0) {
+                    errorMsg = errorMsg + '\n\n' + validationErrors.join('\n');
+                }
+            }
+            showError(errorMsg);
         }
     } catch (error) {
         console.error('Login error:', error);

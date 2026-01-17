@@ -1280,6 +1280,19 @@ const api = {
             // Використовуємо повідомлення з сервера або стандартне
             let errorMessage = data.message || data.error || `Помилка сервера (${response.status})`;
             
+            // Якщо є помилки валідації, додаємо їх до повідомлення
+            if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+                const validationErrors = data.errors.map(err => {
+                    const field = err.param || err.field || '';
+                    const msg = err.msg || err.message || '';
+                    return field ? `${field}: ${msg}` : msg;
+                }).filter(msg => msg).join('\n');
+                
+                if (validationErrors) {
+                    errorMessage = errorMessage + '\n\n' + validationErrors;
+                }
+            }
+            
             // Додаємо підказку якщо є
             if (data.hint) {
                 errorMessage += `\n💡 Підказка: ${data.hint}`;
