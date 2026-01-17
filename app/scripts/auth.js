@@ -225,6 +225,11 @@ async function handleLogin(event) {
                 window.currentUser = data.user;
             }
             closeModal('loginModal');
+            // Приховуємо authScreenTS одразу після логіну
+            const authScreenTS = document.getElementById('authScreenTS');
+            if (authScreenTS) {
+                authScreenTS.style.display = 'none';
+            }
             showMainContent();
             updateUserInfo();
             checkUserRole();
@@ -289,6 +294,11 @@ async function handleRegister(event) {
                 window.currentUser = data.user;
             }
             closeModal('registerModal');
+            // Приховуємо authScreenTS одразу після реєстрації
+            const authScreenTS = document.getElementById('authScreenTS');
+            if (authScreenTS) {
+                authScreenTS.style.display = 'none';
+            }
             showMainContent();
             updateUserInfo();
             checkUserRole();

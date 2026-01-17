@@ -1368,14 +1368,14 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
     </div>
 
     <!-- Login Modal -->
-    <div id="loginModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'loginModal')">
-        <div class="modal-content auth-modal" onclick="event.stopPropagation()">
+    <div id="loginModal" class="modal-overlay" data-modal="loginModal">
+        <div class="modal-content auth-modal">
             <div class="modal-header">
                 <div class="modal-title">Вхід в систему</div>
-                <button class="close-btn" onclick="closeModal('loginModal')">✕</button>
+                <button class="close-btn" data-close="loginModal">✕</button>
             </div>
             <div class="modal-body">
-                <form id="loginForm" onsubmit="handleLogin(event); return false;">
+                <form id="loginForm">
                     <div class="form-group">
                         <label>E-mail</label>
                         <input type="email" id="loginEmail" required autocomplete="email">
@@ -1386,7 +1386,7 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn-primary">Увійти</button>
-                        <button type="button" class="btn-secondary" onclick="closeModal('loginModal')">Скасувати</button>
+                        <button type="button" class="btn-secondary" data-close="loginModal">Скасувати</button>
                     </div>
                 </form>
             </div>
@@ -1394,14 +1394,14 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
     </div>
 
     <!-- Register Modal -->
-    <div id="registerModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'registerModal')">
-        <div class="modal-content auth-modal" onclick="event.stopPropagation()">
+    <div id="registerModal" class="modal-overlay" data-modal="registerModal">
+        <div class="modal-content auth-modal">
             <div class="modal-header">
                 <div class="modal-title">Реєстрація</div>
-                <button class="close-btn" onclick="closeModal('registerModal')">✕</button>
+                <button class="close-btn" data-close="registerModal">✕</button>
             </div>
             <div class="modal-body">
-                <form id="registerForm" onsubmit="handleRegister(event); return false;">
+                <form id="registerForm">
                     <div class="form-group">
                         <label>ПІБ (Повне ім'я)</label>
                         <input type="text" id="registerFullName" required autocomplete="name">
@@ -1421,8 +1421,8 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn-primary">Зареєструватися</button>
-                        <button type="button" class="btn-secondary" onclick="closeModal('registerModal')">Скасувати</button>
-                        <button type="button" class="btn-link" onclick="closeModal('registerModal'); window.location.href='../public/index.html'">← На головну</button>
+                        <button type="button" class="btn-secondary" data-close="registerModal">Скасувати</button>
+                        <button type="button" class="btn-link" data-close="registerModal" data-href="../public/index.html">← На головну</button>
                     </div>
                 </form>
             </div>
@@ -1431,33 +1431,33 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
 
     <!-- Модальні вікна -->
     <!-- Модальне вікно картки військовослужбовця -->
-    <div id="personnelModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'personnelModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="personnelModal" class="modal-overlay" data-modal="personnelModal">
+        <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title" id="modalTitle">Картка військовослужбовця</div>
-                <button class="close-btn" onclick="closePersonnelModal()">✕</button>
+                <button class="close-btn" data-close="personnelModal">✕</button>
             </div>
             <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
 
     <!-- Модальне вікно картки засобу -->
-    <div id="equipmentModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'equipmentModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="equipmentModal" class="modal-overlay" data-modal="equipmentModal">
+        <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title" id="equipmentModalTitle">Картка засобу</div>
-                <button class="close-btn" onclick="closeEquipmentModal()">✕</button>
+                <button class="close-btn" data-close="equipmentModal">✕</button>
             </div>
             <div class="modal-body" id="equipmentModalBody"></div>
         </div>
     </div>
 
     <!-- Модальне вікно картки екіпажу -->
-    <div id="crewModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'crewModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="crewModal" class="modal-overlay" data-modal="crewModal">
+        <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title" id="crewModalTitle">Картка екіпажу</div>
-                <button class="close-btn" onclick="closeCrewModal()">✕</button>
+                <button class="close-btn" data-close="crewModal">✕</button>
             </div>
             <div class="modal-body" id="crewModalBody"></div>
         </div>
@@ -1480,7 +1480,7 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
     <script src="app/scripts/equipment.js"></script>
     <script src="app/scripts/courses.js"></script>
     <script>
-        // Ініціалізація кнопок авторизації після завантаження скриптів
+        // Ініціалізація кнопок авторизації та модальних вікон після завантаження скриптів
         document.addEventListener('DOMContentLoaded', function() {
             // Додаємо event listeners для кнопок авторизації
             setTimeout(function() {
@@ -1488,15 +1488,68 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
                 const registerBtn = document.querySelector('#authScreenTS .auth-screen-btn.secondary');
                 
                 if (loginBtn && typeof showLoginModal === 'function') {
-                    loginBtn.onclick = function() {
+                    loginBtn.addEventListener('click', function() {
                         showLoginModal();
-                    };
+                    });
                 }
                 
                 if (registerBtn && typeof showRegisterModal === 'function') {
-                    registerBtn.onclick = function() {
+                    registerBtn.addEventListener('click', function() {
                         showRegisterModal();
-                    };
+                    });
+                }
+                
+                // Обробка модальних вікон через data-атрибути
+                document.querySelectorAll('[data-modal]').forEach(function(modal) {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            const modalId = modal.getAttribute('data-modal');
+                            if (typeof closeModal === 'function') {
+                                closeModal(modalId);
+                            }
+                        }
+                    });
+                });
+                
+                // Зупинка propagation для modal-content
+                document.querySelectorAll('.modal-content').forEach(function(content) {
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                });
+                
+                // Обробка кнопок закриття
+                document.querySelectorAll('[data-close]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const modalId = btn.getAttribute('data-close');
+                        if (typeof closeModal === 'function') {
+                            closeModal(modalId);
+                        }
+                        // Якщо є data-href, перенаправляємо
+                        const href = btn.getAttribute('data-href');
+                        if (href) {
+                            window.location.href = href;
+                        }
+                    });
+                });
+                
+                // Обробка форм
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm && typeof handleLogin === 'function') {
+                    loginForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        handleLogin(e);
+                        return false;
+                    });
+                }
+                
+                const registerForm = document.getElementById('registerForm');
+                if (registerForm && typeof handleRegister === 'function') {
+                    registerForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        handleRegister(e);
+                        return false;
+                    });
                 }
             }, 100);
         });
