@@ -30,28 +30,111 @@ function getRuntimeConfig() {
     };
 }
 
-// Локально використовуємо backend на 3000 порту, у проді - Railway backend
+// Локально використовуємо backend на 3000 порту, у проді - Render backend
 // 
-// ⚠️ ВАЖЛИВО: Для деплою на Railway замініть на фактичний домен Railway сервісу
-// 
-// Інструкція:
-// 1. Після деплою на Railway, отримайте URL з Settings → Networking → Generate Domain
-// 2. Оновіть Railway URL нижче (повний URL з /api в кінці)
+// ⚠️ ВАЖЛИВО: Для деплою встановіть URL через один з способів:
+// 1. Через localStorage: localStorage.setItem('REMOTE_API_URL', 'https://your-domain.onrender.com/api')
+// 2. Через window.__APP_CONFIG__: window.__APP_CONFIG__ = { remoteApiUrl: 'https://your-domain.onrender.com/api' }
+// 3. Через URL параметр: ?apiUrl=https://your-domain.onrender.com/api
 // 
 // Приклад:
-// Railway URL: https://training-recording-production.up.railway.app
-// RAILWAY_API_URL: https://training-recording-production.up.railway.app/api
+// Render URL: https://training-recording-backend.onrender.com
+// API URL: https://training-recording-backend.onrender.com/api
 //
-// Детальна інструкція: див. backend/RAILWAY_DEPLOY.md
+// Детальна інструкція: див. RENDER_DEPLOY.md
 
-// Railway backend URL - оновіть на ваш фактичний Railway URL
-// Замініть 'ВАШ_RAILWAY_DOMAIN' на домен з Railway Settings → Networking
-const RAILWAY_API_URL = 'https://ВАШ_RAILWAY_DOMAIN.up.railway.app/api';
+// Render backend URL - fallback (використовується тільки якщо не встановлено через runtime config)
+// Для GitHub Pages встановіть через localStorage або window.__APP_CONFIG__
+const DEFAULT_RENDER_API_URL = 'https://training-recording-backend.onrender.com/api';
 
 const runtimeConfig = getRuntimeConfig();
 
-const API_BASE_URL = runtimeConfig.apiBaseUrl
-    || (IS_LOCALHOST ? 'http://localhost:3000/api' : (runtimeConfig.remoteApiUrl || RAILWAY_API_URL));
+// Функція для валідації та санитизації API URL
+function validateAndSanitizeUrl(url) {
+    if (!url || typeof url !== 'string') {
+        return null;
+    }
+    
+    const trimmedUrl = url.trim();
+    
+    // Перевіряємо чи URL не містить закодовані символи, що вказують на проблему (наприклад, xn--_)
+    if (trimmedUrl.includes('xn--_') || trimmedUrl.includes('xn--_railway_domain')) {
+        console.warn('⚠️ Виявлено пошкоджений URL:', trimmedUrl);
+        // Очищаємо localStorage від пошкодженого URL
+        if (IS_BROWSER && window.localStorage) {
+            window.localStorage.removeItem('API_BASE_URL');
+            window.localStorage.removeItem('REMOTE_API_URL');
+        }
+        return null;
+    }
+    
+    // Перевіряємо базовий формат URL
+    try {
+        const urlObj = new URL(trimmedUrl);
+        // Перевіряємо чи це HTTP/HTTPS протокол
+        if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+            return null;
+        }
+        return trimmedUrl;
+    } catch (e) {
+        // Якщо URL невалідний, повертаємо null
+        console.warn('⚠️ Невінідний API URL:', trimmedUrl, e);
+        return null;
+    }
+}
+
+// Функція для визначення API URL
+function getApiBaseUrl() {
+    // 1. Перевіряємо runtime config (найвищий пріоритет)
+    if (runtimeConfig.apiBaseUrl) {
+        const validated = validateAndSanitizeUrl(runtimeConfig.apiBaseUrl);
+        if (validated) return validated;
+    }
+    
+    // 2. Перевіряємо remoteApiUrl з runtime config
+    if (runtimeConfig.remoteApiUrl) {
+        const validated = validateAndSanitizeUrl(runtimeConfig.remoteApiUrl);
+        if (validated) return validated;
+    }
+    
+    // 3. Для localhost використовуємо локальний сервер
+    if (IS_LOCALHOST) {
+        return 'http://localhost:3000/api';
+    }
+    
+    // 4. Для GitHub Pages перевіряємо URL параметр
+    if (IS_BROWSER) {
+        const params = new URLSearchParams(window.location.search);
+        const apiUrlParam = params.get('apiUrl');
+        if (apiUrlParam) {
+            const validated = validateAndSanitizeUrl(apiUrlParam);
+            if (validated) {
+                // Зберігаємо в localStorage для наступних завантажень
+                if (window.localStorage) {
+                    window.localStorage.setItem('REMOTE_API_URL', validated);
+                }
+                return validated;
+            }
+        }
+    }
+    
+    // 5. Fallback до Render URL (якщо встановлено)
+    if (DEFAULT_RENDER_API_URL && !DEFAULT_RENDER_API_URL.includes('ВАШ_')) {
+        return DEFAULT_RENDER_API_URL;
+    }
+    
+    // 6. Останній fallback - спроба визначити з поточного домену (для GitHub Pages)
+    if (IS_BROWSER && window.location.origin.includes('github.io')) {
+        // Для GitHub Pages потрібно встановити Render URL вручну
+        console.warn('⚠️ Render API URL не встановлено. Встановіть через localStorage.setItem("REMOTE_API_URL", "https://your-domain.onrender.com/api")');
+        // Повертаємо null, щоб викликати помилку
+        return null;
+    }
+    
+    return DEFAULT_RENDER_API_URL;
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Використовувати backend API (а не локальну SQLite в браузері)
 const USE_LOCAL_DB = runtimeConfig.useLocalDb ?? false;
@@ -77,6 +160,14 @@ const api = {
         if (USE_LOCAL_DB) {
             return localAuth.login(data);
         }
+        
+        // Перевіряємо чи API_BASE_URL встановлено
+        if (!API_BASE_URL) {
+            const errorMsg = 'API URL не налаштовано. Встановіть Render URL через localStorage.setItem("REMOTE_API_URL", "https://your-domain.onrender.com/api")';
+            console.error(errorMsg);
+            throw new Error(errorMsg);
+        }
+        
         try {
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
@@ -86,13 +177,28 @@ const api = {
                 credentials: 'include',
                 body: JSON.stringify(data)
             });
-            if (!response.ok && response.status === 0) {
-                throw new Error('Не удалось подключиться к серверу. Перевірте чи запущений backend сервер на порту 3000.');
+            
+            // Перевіряємо чи це CORS помилка
+            if (response.status === 0 || response.type === 'opaque') {
+                throw new Error('CORS помилка: Backend не дозволяє запити з цього домену. Перевірте CORS налаштування на сервері.');
             }
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Помилка сервера: ${response.status}`);
+            }
+            
             return response;
         } catch (error) {
             console.error('API connection error:', error);
-            throw new Error('Не удалось подключиться к серверу. Перевірте чи запущений backend сервер на порту 3000.');
+            
+            // Якщо це помилка мережі (CORS, timeout, тощо)
+            if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
+                const apiUrl = API_BASE_URL || 'не налаштовано';
+                throw new Error(`Не вдалося підключитися до сервера на ${apiUrl}. Перевірте:\n1. Чи запущений backend сервер\n2. Чи правильно налаштовано CORS\n3. Чи правильно встановлено API URL (Render: ${DEFAULT_RENDER_API_URL})`);
+            }
+            
+            throw error;
         }
     },
 
@@ -115,21 +221,46 @@ const api = {
         if (USE_LOCAL_DB) {
             return localAuth.getCurrentUser(token);
         }
+        
+        if (!token) {
+            throw new Error('Токен авторизації відсутній');
+        }
+        
+        if (!API_BASE_URL) {
+            throw new Error('API URL не налаштовано');
+        }
+        
         try {
             const response = await fetch(`${API_BASE_URL}/auth/me`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                credentials: 'include'
             });
-            if (!response.ok && response.status === 0) {
-                throw new Error('Не удалось подключиться к серверу. Перевірте чи запущений backend сервер на порту 3000.');
+            
+            // Перевіряємо чи це CORS помилка
+            if (response.status === 0 || response.type === 'opaque') {
+                throw new Error('CORS помилка: Backend не дозволяє запити з цього домену');
             }
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    this.removeToken();
+                    throw new Error('Сесія закінчилася. Будь ласка, увійдіть знову.');
+                }
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Помилка сервера: ${response.status}`);
+            }
+            
             return response;
         } catch (error) {
             console.error('API connection error:', error);
-            throw new Error('Не удалось подключиться к серверу. Перевірте чи запущений backend сервер на порту 3000.');
+            if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
+                throw new Error('Не вдалося підключитися до сервера. Перевірте підключення та CORS налаштування.');
+            }
+            throw error;
         }
     },
 
@@ -264,13 +395,45 @@ const api = {
             return localProfile.getProfile(userData.user.id);
         }
         const token = this.getToken();
-        return fetch(`${API_BASE_URL}/profile`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+        if (!token) {
+            throw new Error('Токен авторизації відсутній. Будь ласка, увійдіть в систему.');
+        }
+        
+        if (!API_BASE_URL) {
+            throw new Error('API URL не налаштовано');
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    // Токен недійсний - видаляємо його
+                    this.removeToken();
+                    throw new Error('Сесія закінчилася. Будь ласка, увійдіть знову.');
+                }
+                if (response.status === 404) {
+                    throw new Error('Профіль не знайдено');
+                }
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `Помилка сервера: ${response.status}`);
             }
-        });
+            
+            return response;
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
+                throw new Error('Не вдалося підключитися до сервера. Перевірте підключення.');
+            }
+            throw error;
+        }
     },
 
     // Courses endpoints (додаткові)

@@ -179,9 +179,9 @@ var wpml_cookies = {"wp-wpml_current_language":{"value":"uk","expires":1,"path":
 	</ul>
 </div>
 </div><div class="languages-widget-block"></div>                </div>
-                <button id="toggleMenu">
+                <button id="toggleMenu" onclick="handleMenuButtonClick(event)">
                     <span class="icon-open">
-                        <img src="images/burger.svg" alt="Бургер Меню"><span class="d-none d-md-block">Меню</span>
+                        <img src="images/burger.svg" alt="Бургер Меню"><span class="d-none d-md-block">Вхід</span>
                     </span>
                     <img class="icon-close" src="images/close-icon-sm.svg" alt="Іконка Закрити">
                 </button>
@@ -257,8 +257,8 @@ var wpml_cookies = {"wp-wpml_current_language":{"value":"uk","expires":1,"path":
 </div>
 </div><div class="languages-widget-block"></div></div>
 
-<nav class="header-menu hide-scrollbar"><ul id="menu-header-menu" class="menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-9 current_page_item menu-item-32"><span>Головна</span></li>
-<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1411"><span>Про корпус</span></li>
+<nav class="header-menu hide-scrollbar"><ul id="menu-header-menu" class="menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-9 current_page_item menu-item-32"><a href="index.html" aria-current="page">Головна</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1411"><a href="index.html">Про корпус</a></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-36"><span>Вакансії</span></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-37"><span>FAQ</span></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1091"><span>Для іноземців</span></li>
@@ -1034,6 +1034,60 @@ var foreignersFormData = {"ajaxUrl":"","nonce":"","recaptcha":{"enabled":false,"
             initAuthCheck();
         }
     })();
+    
+    // Обробник кнопки меню/входу
+    function handleMenuButtonClick(event) {
+        event.preventDefault();
+        
+        // Перевіряємо чи користувач залогінений
+        const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+        
+        if (token) {
+            // Якщо залогінений, показуємо меню (якщо воно закрите) або закриваємо його
+            const menuWrapper = document.querySelector('.menu-wrapper');
+            if (menuWrapper) {
+                const isOpen = menuWrapper.getAttribute('aria-hidden') === 'false';
+                if (isOpen) {
+                    menuWrapper.setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('menu-open');
+                } else {
+                    menuWrapper.setAttribute('aria-hidden', 'false');
+                    document.body.classList.add('menu-open');
+                }
+            }
+        } else {
+            // Якщо не залогінений, показуємо модальне вікно входу
+            if (typeof showLoginModal === 'function') {
+                showLoginModal();
+            } else {
+                // Якщо функція не доступна, перенаправляємо на login.html
+                window.location.href = 'login.html';
+            }
+        }
+    }
+    
+    // Оновлюємо видимість меню на основі статусу авторизації
+    function updateMenuVisibility() {
+        const menuWrapper = document.querySelector('.menu-wrapper');
+        const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+        
+        if (menuWrapper) {
+            // Меню доступне тільки для залогінених користувачів
+            // Але кнопка "Вхід" завжди видима
+            // Тут ми просто забезпечуємо, що меню закрито для незалогінених
+            if (!token) {
+                menuWrapper.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('menu-open');
+            }
+        }
+    }
+    
+    // Перевіряємо статус меню при завантаженні
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateMenuVisibility);
+    } else {
+        updateMenuVisibility();
+    }
 </script>
 <script id="wp-emoji-settings" type="application/json">
 {"baseUrl":"","ext":".png","svgUrl":"","svgExt":".svg","source":{"concatemoji":""}}

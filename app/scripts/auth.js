@@ -4,8 +4,12 @@ let currentUser = null;
 
 // Перевірка автентифікації
 async function checkAuth() {
+    // Дозволяємо прямій доступ до training.html без перевірки токену
+    // Користувач зможе увійти безпосередньо на сторінці
+    const isTrainingPage = typeof window !== 'undefined' && window.location.pathname.includes('training.html');
+    
     const token = api.getToken();
-    if (!token) {
+    if (!token && !isTrainingPage) {
         showAuthScreen();
         return;
     }
@@ -225,6 +229,11 @@ async function handleLogin(event) {
                 window.currentUser = data.user;
             }
             closeModal('loginModal');
+            // Приховуємо authScreenTS одразу після логіну
+            const authScreenTS = document.getElementById('authScreenTS');
+            if (authScreenTS) {
+                authScreenTS.style.display = 'none';
+            }
             showMainContent();
             updateUserInfo();
             checkUserRole();
@@ -289,6 +298,11 @@ async function handleRegister(event) {
                 window.currentUser = data.user;
             }
             closeModal('registerModal');
+            // Приховуємо authScreenTS одразу після реєстрації
+            const authScreenTS = document.getElementById('authScreenTS');
+            if (authScreenTS) {
+                authScreenTS.style.display = 'none';
+            }
             showMainContent();
             updateUserInfo();
             checkUserRole();
