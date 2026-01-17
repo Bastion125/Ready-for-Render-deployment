@@ -10,6 +10,17 @@ async function checkAuth() {
         return;
     }
 
+    // Якщо є токен, одразу приховуємо authScreenTS та показуємо mainContent
+    // Це потрібно щоб не показувати екран автентифікації якщо користувач залогінений на основному сайті
+    const authScreenTS = document.getElementById('authScreenTS');
+    if (authScreenTS) {
+        authScreenTS.style.display = 'none';
+    }
+    const mainContent = document.getElementById('mainContent');
+    if (mainContent) {
+        mainContent.style.display = 'block';
+    }
+
     try {
         const response = await api.getCurrentUser();
         const data = await api.handleResponse(response);
@@ -20,22 +31,41 @@ async function checkAuth() {
             if (typeof window !== 'undefined') {
                 window.currentUser = data.user;
             }
+            // Якщо користувач залогінений, одразу показуємо mainContent та приховуємо всі екрани автентифікації
             showMainContent();
             updateUserInfo();
             checkUserRole();
         } else {
+            // Тільки якщо токен недійсний, показуємо екран автентифікації
+            api.removeToken();
             showAuthScreen();
         }
     } catch (error) {
         console.error('Auth check error:', error);
-        // Показуємо користувачу зрозуміле повідомлення про помилку підключення
-        if (error.message && error.message.includes('Не удалось подключиться к серверу')) {
-            showNotification('Помилка підключення до сервера. Перевірте чи запущений backend сервер на порту 3000.', 'error');
-        } else if (error.message && !error.message.includes('Сесія недійсна') && !error.message.includes('Токен не знайдено')) {
-            console.warn('Auth check warning:', error.message);
+        // Якщо є помилка перевірки, але токен є, не показуємо екран автентифікації
+        // Можливо це тимчасова помилка підключення
+        const isAuthError = error.message && (
+            error.message.includes('Сесія недійсна') || 
+            error.message.includes('Токен не знайдено') ||
+            error.message.includes('401') ||
+            error.message.includes('Unauthorized')
+        );
+        
+        if (isAuthError) {
+            // Тільки якщо це помилка авторизації, видаляємо токен та показуємо екран
+            api.removeToken();
+            showAuthScreen();
+        } else {
+            // Для інших помилок (підключення тощо) не показуємо екран автентифікації
+            // Користувач залишається в системі якщо токен є
+            if (error.message && error.message.includes('Не удалось подключиться к серверу')) {
+                showNotification('Помилка підключення до сервера. Перевірте чи запущений backend сервер на порту 3000.', 'error');
+            } else if (error.message && !error.message.includes('Сесія недійсна') && !error.message.includes('Токен не знайдено')) {
+                console.warn('Auth check warning:', error.message);
+            }
+            // Не показуємо authScreenTS, користувач залишається залогіненим
+            // Можливо просто тимчасова проблема з сервером
         }
-        api.removeToken();
-        showAuthScreen();
     }
 }
 
@@ -44,6 +74,15 @@ function showAuthScreen() {
     const authScreen = document.getElementById('authScreen');
     const authScreenTS = document.getElementById('authScreenTS');
     const mainContent = document.getElementById('mainContent');
+    
+    // Перевіряємо чи є токен - якщо є, не показуємо екрани автентифікації
+    const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+    if (token) {
+        // Якщо є токен, користувач вже залогінений - не показуємо authScreenTS
+        if (authScreenTS) authScreenTS.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+        return;
+    }
     
     // Якщо є authScreenTS (training.html), використовуємо його
     if (authScreenTS) {
@@ -63,11 +102,18 @@ function showMainContent() {
     const authScreenTS = document.getElementById('authScreenTS');
     const mainContent = document.getElementById('mainContent');
     
-    // Якщо є authScreenTS (training.html), приховуємо його
+    // Якщо є authScreenTS (training.html), приховуємо його та homepage
     if (authScreenTS) {
         authScreenTS.style.display = 'none';
-        if (authScreen) authScreen.style.display = 'none';
-        if (mainContent) mainContent.style.display = 'block';
+        // Приховуємо homepage (authScreen) якщо показуємо training system
+        if (authScreen) {
+            authScreen.style.display = 'none';
+            // Видаляємо !important з inline стилів якщо вони є
+            authScreen.style.setProperty('display', 'none', 'important');
+        }
+        if (mainContent) {
+            mainContent.style.display = 'block';
+        }
     } else if (authScreen) {
         // Стандартна поведінка для інших файлів
         authScreen.style.display = 'none';
@@ -403,4 +449,3 @@ if (typeof module !== 'undefined' && module.exports) {
         currentUser: () => currentUser
     };
 }
-
