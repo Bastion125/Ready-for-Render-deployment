@@ -49,16 +49,52 @@ const DEFAULT_RENDER_API_URL = 'https://training-recording-backend.onrender.com/
 
 const runtimeConfig = getRuntimeConfig();
 
+// Функція для валідації та санитизації API URL
+function validateAndSanitizeUrl(url) {
+    if (!url || typeof url !== 'string') {
+        return null;
+    }
+    
+    const trimmedUrl = url.trim();
+    
+    // Перевіряємо чи URL не містить закодовані символи, що вказують на проблему (наприклад, xn--_)
+    if (trimmedUrl.includes('xn--_') || trimmedUrl.includes('xn--_railway_domain')) {
+        console.warn('⚠️ Виявлено пошкоджений URL:', trimmedUrl);
+        // Очищаємо localStorage від пошкодженого URL
+        if (IS_BROWSER && window.localStorage) {
+            window.localStorage.removeItem('API_BASE_URL');
+            window.localStorage.removeItem('REMOTE_API_URL');
+        }
+        return null;
+    }
+    
+    // Перевіряємо базовий формат URL
+    try {
+        const urlObj = new URL(trimmedUrl);
+        // Перевіряємо чи це HTTP/HTTPS протокол
+        if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+            return null;
+        }
+        return trimmedUrl;
+    } catch (e) {
+        // Якщо URL невалідний, повертаємо null
+        console.warn('⚠️ Невінідний API URL:', trimmedUrl, e);
+        return null;
+    }
+}
+
 // Функція для визначення API URL
 function getApiBaseUrl() {
     // 1. Перевіряємо runtime config (найвищий пріоритет)
     if (runtimeConfig.apiBaseUrl) {
-        return runtimeConfig.apiBaseUrl;
+        const validated = validateAndSanitizeUrl(runtimeConfig.apiBaseUrl);
+        if (validated) return validated;
     }
     
     // 2. Перевіряємо remoteApiUrl з runtime config
     if (runtimeConfig.remoteApiUrl) {
-        return runtimeConfig.remoteApiUrl;
+        const validated = validateAndSanitizeUrl(runtimeConfig.remoteApiUrl);
+        if (validated) return validated;
     }
     
     // 3. Для localhost використовуємо локальний сервер
@@ -71,11 +107,14 @@ function getApiBaseUrl() {
         const params = new URLSearchParams(window.location.search);
         const apiUrlParam = params.get('apiUrl');
         if (apiUrlParam) {
-            // Зберігаємо в localStorage для наступних завантажень
-            if (window.localStorage) {
-                window.localStorage.setItem('REMOTE_API_URL', apiUrlParam);
+            const validated = validateAndSanitizeUrl(apiUrlParam);
+            if (validated) {
+                // Зберігаємо в localStorage для наступних завантажень
+                if (window.localStorage) {
+                    window.localStorage.setItem('REMOTE_API_URL', validated);
+                }
+                return validated;
             }
-            return apiUrlParam;
         }
     }
     
