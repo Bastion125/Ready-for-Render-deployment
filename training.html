@@ -1016,10 +1016,10 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
             <h1 class="auth-screen-title">Training Recording System</h1>
             <div class="auth-screen-subtitle">База знань та облік навченості</div>
             <div class="auth-screen-buttons">
-                <button class="auth-screen-btn primary" onclick="showLoginModal()">
+                <button class="auth-screen-btn primary" onclick="if(typeof showLoginModal === 'function') showLoginModal(); else console.error('showLoginModal not found');">
                     🔐 Увійти
                 </button>
-                <button class="auth-screen-btn secondary" onclick="showRegisterModal()">
+                <button class="auth-screen-btn secondary" onclick="if(typeof showRegisterModal === 'function') showRegisterModal(); else console.error('showRegisterModal not found');">
                     📝 Реєстрація
                 </button>
             </div>
@@ -1480,6 +1480,27 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
     <script src="app/scripts/equipment.js"></script>
     <script src="app/scripts/courses.js"></script>
     <script>
+        // Ініціалізація кнопок авторизації після завантаження скриптів
+        document.addEventListener('DOMContentLoaded', function() {
+            // Додаємо event listeners для кнопок авторизації
+            setTimeout(function() {
+                const loginBtn = document.querySelector('#authScreenTS .auth-screen-btn.primary');
+                const registerBtn = document.querySelector('#authScreenTS .auth-screen-btn.secondary');
+                
+                if (loginBtn && typeof showLoginModal === 'function') {
+                    loginBtn.onclick = function() {
+                        showLoginModal();
+                    };
+                }
+                
+                if (registerBtn && typeof showRegisterModal === 'function') {
+                    registerBtn.onclick = function() {
+                        showRegisterModal();
+                    };
+                }
+            }, 100);
+        });
+        
         // Ініціалізація при завантаженні
         window.addEventListener('load', async () => {
             try {

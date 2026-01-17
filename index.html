@@ -111,6 +111,27 @@ var wpml_cookies = {"wp-wpml_current_language":{"value":"uk","expires":1,"path":
 .header-menu .menu-item > a:hover {
     text-decoration: underline;
 }
+/* Мобільні стилі для header */
+@media (max-width: 767px) {
+    .header-title-desktop {
+        display: none !important;
+    }
+    .header-title-mobile {
+        display: block !important;
+    }
+    .col-4 {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    .col-4 .custom-logo-link {
+        margin-bottom: 0;
+    }
+}
+@media (min-width: 768px) {
+    .header-title-mobile {
+        display: none !important;
+    }
+}
 </style>
 </head>
 
@@ -126,11 +147,12 @@ var wpml_cookies = {"wp-wpml_current_language":{"value":"uk","expires":1,"path":
 <header class="header">
     <div class="container">
         <div class="row gx-0 align-items-center">
-            <div class="col-4" style="display: flex; align-items: center; gap: 15px; position: relative;">
+            <div class="col-4" style="display: flex; align-items: center; gap: 15px; position: relative; flex-wrap: wrap;">
                 <a href="https://ab3.army/" class="custom-logo-link" rel="home" aria-current="page">
                     <img width="171" height="48" src="images/logo-125.png" class="custom-logo" alt="125 окрема важка механізована бригада" decoding="async">
                 </a>
-                <span style="display: grid; font-size: 20px; color: rgba(246, 146, 30, 1); font-weight: 600; font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace; line-height: 1.2; position: absolute; top: 34px; left: 144px; width: 150px; height: 100px; vertical-align: bottom; text-align: left; letter-spacing: -0.4px; margin: 9px -9px; padding: 0; gap: 0; flex-wrap: wrap; justify-content: flex-start; align-items: flex-start; border-radius: 0; border: none; transform: none; word-wrap: break-word; overflow-wrap: break-word; overflow: hidden;">125 ОКРЕМА ВАЖКА МЕХАНІЗОВАНА БРИГАДА</span>
+                <span class="header-title-mobile" style="display: none; font-size: 14px; color: rgba(246, 146, 30, 1); font-weight: 600; font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace; line-height: 1.2; text-align: left; letter-spacing: -0.4px; word-wrap: break-word; overflow-wrap: break-word; width: 100%; margin-top: 5px;">125 ОКРЕМА ВАЖКА МЕХАНІЗОВАНА БРИГАДА</span>
+                <span class="header-title-desktop" style="display: grid; font-size: 20px; color: rgba(246, 146, 30, 1); font-weight: 600; font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace; line-height: 1.2; position: absolute; top: 34px; left: 144px; width: 150px; height: 100px; vertical-align: bottom; text-align: left; letter-spacing: -0.4px; margin: 9px -9px; padding: 0; gap: 0; flex-wrap: wrap; justify-content: flex-start; align-items: flex-start; border-radius: 0; border: none; transform: none; word-wrap: break-word; overflow-wrap: break-word; overflow: hidden;">125 ОКРЕМА ВАЖКА МЕХАНІЗОВАНА БРИГАДА</span>
             </div>
             <div class="col-8 d-flex justify-content-end align-items-center gap-3 gap-lg-5">
                 <button class="header__btn btn btn-tertiary" data-bs-toggle="modal" data-bs-target="#contactFormModal" data-aos="fade-up" data-aos-delay="100">Подати заявку                </button>
