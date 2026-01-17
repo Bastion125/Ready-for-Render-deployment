@@ -1023,6 +1023,11 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
                     📝 Реєстрація
                 </button>
             </div>
+            <div class="auth-screen-home-link">
+                <a href="index.html">
+                    ← На головний сайт
+                </a>
+            </div>
         </div>
     </div>
 
@@ -1478,6 +1483,15 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
         // Ініціалізація при завантаженні
         window.addEventListener('load', async () => {
             try {
+                // Спочатку перевіряємо чи є токен, щоб не показувати authScreenTS зайво
+                const token = typeof api !== 'undefined' && api.getToken ? api.getToken() : null;
+                const authScreenTS = document.getElementById('authScreenTS');
+                
+                // Якщо є токен, одразу приховуємо authScreenTS (він не повинен показуватися для залогінених)
+                if (token && authScreenTS) {
+                    authScreenTS.style.display = 'none';
+                }
+
                 const useLocalDb = typeof window !== 'undefined' && window.USE_LOCAL_DB === true;
 
                 // Для локальної версії (SQL.js) спочатку ініціалізуємо БД.
@@ -1492,9 +1506,9 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
                     }
                 }
 
-                // Перевіряємо автентифікацію
+                // Перевіряємо автентифікацію (якщо токен є, checkAuth покаже mainContent, якщо ні - покаже authScreenTS)
                 if (typeof checkAuth === 'function') {
-                    checkAuth();
+                    await checkAuth();
                 } else {
                     console.warn('checkAuth function not found');
                 }

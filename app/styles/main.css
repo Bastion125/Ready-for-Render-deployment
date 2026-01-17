@@ -40,17 +40,22 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: var(--bg-dark);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(10, 10, 10, 0.98) 100%);
+    background-image: url('../../images/bg-universe-2.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 .auth-screen-content {
     text-align: center;
     padding: 40px;
-    background: var(--bg-card);
-    border: 3px solid var(--primary);
-    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #F6921E;
+    border-radius: 8px;
     max-width: 500px;
     width: 90%;
+    box-shadow: 0 8px 32px rgba(246, 146, 30, 0.2);
 }
 
 .heraldic-emblem-auth {
@@ -60,17 +65,20 @@ body {
 }
 
 .auth-screen-title {
-    color: var(--primary);
+    color: #F6921E;
     font-size: 32px;
+    font-weight: bold;
+    font-family: 'UAF Sans', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace, sans-serif;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     margin-bottom: 15px;
 }
 
 .auth-screen-subtitle {
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 16px;
     margin-bottom: 40px;
+    font-family: 'UAF Sans', sans-serif;
 }
 
 .auth-screen-buttons {
@@ -82,31 +90,56 @@ body {
 .auth-screen-btn {
     padding: 16px 32px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
+    font-family: 'UAF Sans', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace, sans-serif;
     text-transform: uppercase;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 2px solid var(--primary);
+    border: 2px solid #F6921E;
 }
 
 .auth-screen-btn.primary {
-    background: var(--primary);
+    background: #F6921E;
     color: #000;
 }
 
 .auth-screen-btn.primary:hover {
-    background: var(--primary-light);
+    background: #ffa346;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(246, 146, 30, 0.4);
 }
 
 .auth-screen-btn.secondary {
     background: transparent;
-    color: var(--primary);
+    color: #F6921E;
 }
 
 .auth-screen-btn.secondary:hover {
-    background: rgba(230, 168, 87, 0.1);
+    background: rgba(246, 146, 30, 0.1);
+    border-color: #ffa346;
+}
+
+.auth-screen-home-link {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(246, 146, 30, 0.3);
+}
+
+.auth-screen-home-link a {
+    color: #F6921E;
+    text-decoration: none;
+    font-family: 'UAF Sans', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auth-screen-home-link a:hover {
+    color: #ffa346;
+    text-decoration: underline;
 }
 
 /* ========== HEADER ========== */
